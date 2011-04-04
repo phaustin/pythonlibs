@@ -5,9 +5,11 @@
 
 import os,stat,time,datetime
 
+print "caught walker I"
+
 class DirectoryStatWalker(object):
     """return {'fullname':fullname, 'fullStats':fullStats,
-      'directory':self.directory,'filename':file,
+      'directory':self.directory,'filename':the_file,
       'isDir':stat.S_ISDIR(mode),'modTime':modtime}
     """
 
@@ -19,7 +21,7 @@ class DirectoryStatWalker(object):
     def __getitem__(self, index):
         while 1:
             try:
-                file = self.files[self.index]
+                the_file = self.files[self.index]
                 self.index = self.index + 1
             except IndexError:
                 # pop next directory from stack
@@ -28,11 +30,9 @@ class DirectoryStatWalker(object):
                 self.index = 0
             else:
                 # got a filename or directory
-                fullname = os.path.join(self.directory, file)
-                try:
-                    fullStats = os.stat(fullname)
-                except OSError:
-                    continue
+                fullname = os.path.join(self.directory,\
+                                    the_file)
+                fullStats = os.stat(fullname)
                 mode = fullStats[stat.ST_MODE]
                 #push the directory on the stack
                 if stat.S_ISDIR(mode) and not stat.S_ISLNK(mode):
@@ -51,6 +51,7 @@ if __name__== "__main__":
     for item in keepfiles:
         if item['isDir']:
             print item['fullname']
+    
 
         
 
