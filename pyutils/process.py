@@ -2,12 +2,17 @@
 module for various subprocess commands
 """
 #http://article.gmane.org/gmane.comp.python.general/487577/match=getstatusoutput+subprocess
-def command(command):
+
+import shlex, subprocess
+from subprocess import Popen, PIPE, STDOUT
+
+def command(command_line):
      """
      usage: status,output=command(commandstring)
-     """ 
-     from subprocess import Popen, PIPE, STDOUT
-     p = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True)
+     """
+     args = shlex.split(command_line)
+     p = Popen(args, stdout=PIPE, stderr=STDOUT, shell=False)
      s = p.stdout.read()
+     print "complete: III"
      return p.wait(), s
  

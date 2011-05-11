@@ -41,7 +41,7 @@ class DirectoryStatWalker(object):
                 year,month,day,hour,minute,second=time.localtime(fullStats[stat.ST_MTIME])[:6]
                 modtime=datetime.datetime(year,month,day,hour,minute,second)
                 return {'fullname':fullname, 'fullStats':fullStats,
-                        'directory':self.directory,'filename':file,
+                        'directory':self.directory,'filename':the_file,
                         'isDir':stat.S_ISDIR(mode),'modTime':modtime}
 
 if __name__== "__main__":
