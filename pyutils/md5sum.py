@@ -8,7 +8,7 @@ def md5sum(filename, buf_size=8192):
         # We read the file in small chunk until EOF
         data = f.read(buf_size)
         while data:
-            # We had data to the md5 hash
+            # We hand data to the md5 hash
             m.update(data)
             data = f.read(buf_size)
     # We return the md5 hash in hexadecimal format

@@ -13,6 +13,5 @@ def command(command_line):
      args = shlex.split(command_line)
      p = Popen(args, stdout=PIPE, stderr=STDOUT, shell=False)
      s = p.stdout.read()
-     print "complete: III"
      return p.wait(), s
  

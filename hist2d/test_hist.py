@@ -1,12 +1,8 @@
 from __future__ import division
 import matplotlib as mpl
 import sys,os
-mpl.use('Agg')
-from ubcplot.stdplot import simplots
-from pyutils import process
-
+import matplotlib.pyplot as plt
 import hist2d as h2d
-
 import numpy.random as nr
 import numpy as np
 import numpy.ma as ma
@@ -78,26 +74,24 @@ if debug:
         print out
         print '*'*60
 
-import matplotlib.pyplot as plt
 
 fignum=1
-options={'fignum':1}
-figplot=simplots(option_dict=options)
-the_axis=figplot.singleplot()
+
+fig=plt.figure(fignum)
+fig.clf()
+the_axis=fig.add_subplot(111)
 #for a regular plot, chan2 is the y variable
 the_axis.plot(chan1,chan2,'b+')
 the_axis.set_xlabel('mean chan 1= %5.0f' % invalues['meanx'])
 the_axis.set_ylabel('mean chan 2= %5.0f' % invalues['meany'])
 title='raw_coverage'
 the_axis.set_title(title)
-figname='%s/%s.png' % (plot_dir,title)
-the_axis.figure.canvas.print_figure(figname)
-process.command("firefox %s" % figname)
 
 fignum+=1
-options={'fignum':fignum}
-figplot=simplots(option_dict=options)
-the_axis=figplot.singleplot()
+
+fig=plt.figure(fignum)
+fig.clf()
+the_axis=fig.add_subplot(111)
 print theOut['coverage'].shape
 #for a countour plot chan2 is the x (row) variable
 coverage=theOut['coverage']
@@ -108,19 +102,14 @@ coverage=ma.masked_where(logcoverage < 1.e-2,logcoverage)
 the_axis.contourf(chan1Hist['centers'],chan2Hist['centers'],logcoverage)
 title='contour_coverage'
 the_axis.set_title(title)
-figname='%s/%s.png' % (plot_dir,title)
-the_axis.figure.canvas.print_figure(figname)
-process.command("firefox %s" % figname)
-
 
 fignum+=1
+fig=plt.figure(fignum)
+fig.clf()
+the_axis=fig.add_subplot(111)
 options={'fignum':fignum}
-figplot=simplots(option_dict=options)
-the_axis=figplot.singleplot()
 the_axis.imshow(logcoverage)
 title='log_coverage'
 the_axis.set_title(title)
-figname='%s/%s.png' % (plot_dir,title)
-the_axis.figure.canvas.print_figure(figname)
-process.command("firefox %s" % figname)
 
+plt.show()
