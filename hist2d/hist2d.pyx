@@ -12,7 +12,11 @@ def getVersion():
 def  fullhist(object dataVecPy, int numbins, float mindata, 
               float maxdata,int missingLowValue,int missingHighValue):
     """
-       here is a doc string
+       given a list or numpy array dataVecPy, bin values in
+       numbins between mindata and maxsdata, returning a
+       python dictionary with edges, centers, counts and
+       "fullbins", which is a vector of the same length as
+       dataVecPy with the bin of every datapoint
     """
     dataVecPy=np.ascontiguousarray(dataVecPy,dtype=np.float64)
     cdef np.ndarray[np.double_t,ndim=1] dataVec = dataVecPy
@@ -67,7 +71,8 @@ def hist2D(object xBinPy,object yBinPy,int numXbins, int numYbins):
       yBinArray is a vector of bin indices, each pixel gets a bin number
       numXbins is the total number of bin indices for x
       numYbins is the total number of bin indices for y
-      two different images
+      converageMap is a 2-d histogram with the number of points
+      in each 2d bin
     """
     xBinPy=np.ascontiguousarray(xBinPy,dtype=np.int64)
     cdef np.ndarray[np.int64_t,ndim=1] xBinArray = xBinPy
@@ -103,6 +108,7 @@ def hist2D(object xBinPy,object yBinPy,int numXbins, int numYbins):
     arrayList=[]
     for i in range(numBins2D):
       arrayList.append(np.array(binVecs[i],dtype=np.int64))
+      #number of pixels in each bin
       coveragePtr[i]=len(binVecs[i])
     retval={}
     retval["coverage"]= coverageMap

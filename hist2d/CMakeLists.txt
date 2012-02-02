@@ -21,7 +21,11 @@ set_source_files_properties(
 
 compile_pyx(hist2d test hist2d.pyx)
 add_custom_target(doit ALL SOURCES ${test})
-message("test target is ${test}")
+message("name of test target: ${test}")
 add_library(hist2d SHARED ${test})
 set_target_properties(hist2d PROPERTIES PREFIX "")
 install(TARGETS hist2d LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+add_custom_target(test COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/test_hist.py 
+                    hist2d ${LIBRARY_OUTPUT_PATH}
+                    DEPENDS hist2d COMMENT "execute test_hist.py")

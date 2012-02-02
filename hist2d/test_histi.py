@@ -3,35 +3,11 @@ import matplotlib as mpl
 import sys,os
 import matplotlib.pyplot as plt
 from  matplotlib.colorbar import make_axes
+import hist2d as h2d
 import numpy.random as nr
 import numpy as np
 import numpy.ma as ma
 import imp
-
-#
-# call this test from CMakeLists.txt
-# by passing the .so file and library
-# directory in the command line:
-# add_custom_target(test COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/test_hist.py
-#              hist2d ${LIBRARY_OUTPUT_PATH}
-#              DEPENDS hist2d COMMENT "execute test_hist")
-#
-
-(modname,modpath)=sys.argv[1:]
-print "trying %s %s" % (modname,modpath)
-
-#
-# import $modpath/hist2d.so
-#
-openFile=None
-try:
-    out=imp.find_module(modname,[modpath])
-    the_mod=imp.load_module(modname,*out)
-    openFile=out[0]
-finally:
-    if(openFile):
-        openFile.close()
-h2d=the_mod
 
 invalues={'meanx':450.,
           'stdx':50,
@@ -110,6 +86,7 @@ the_axis=fig.add_subplot(111)
 print theOut['coverage'].shape
 #for a countour plot chan2 is the x (row) variable
 coverage=theOut['coverage']
+#
 # suppress Infs when taking the log
 #
 hit=theOut['coverage'] < 1
