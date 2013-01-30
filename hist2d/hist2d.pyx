@@ -119,7 +119,8 @@ def hist2D(object xBinPy,object yBinPy,int numXbins, int numYbins):
 def takeValues(object dataVectorPy, object indexList):
     """
     do a take of the indices in indexList to populate a new list of data
-    filled with dataVector values
+    filled with dataVector values.  See findMean and findMedian
+    below for usage
     """
     dataVectorPy=np.ascontiguousarray(dataVectorPy,dtype=np.float32)
     dataVectorPy=dataVectorPy.reshape(-1)
@@ -143,8 +144,7 @@ def takeValues(object dataVectorPy, object indexList):
 
 def findMean(object dataVectorPy, object indexList,maskedValue= -9999.):
     """
-    do a take of the indices in indexList to populate a new list of data
-    filled with dataVector values
+    find the mean of binned variables
     """
     dataVectorPy=np.ascontiguousarray(dataVectorPy,dtype=np.float32)
     dataVectorPy=dataVectorPy.reshape(-1)

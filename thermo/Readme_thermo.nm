@@ -1,0 +1,35 @@
+compile mcclatchey.f with
+
+f2py --fcompiler=gfortran -c -m mcclatchey mcclatchey.f
+
+and call with:
+
+z,p,t,rvden,o3den,den = mcclatchey.mccla('midwinter',33)
+
+~/repos/pythonlibs/thermo phil@roc% gfortran -fPIC -shared -c thermos.f
+~/repos/pythonlibs/thermo phil@roc% gfortran -shared -o libthermos.so thermos.o
+
+LDFLAGS="-shared -Wl,-rpath,/home/phil/repos/pythonlibs/thermo" f2py --fcompiler=gfortran -c  -L/home/phil/repos/pythonlibs/thermo  -lthermos -m thetawrap thetawrap.f
+
+1) make the old  fortran code available as as shared library
+
+gfortran -fPIC -c thermos.f  to make thermos.o
+gfortran -shared -o thermos.so thermos.o  to make the shared object
+
+to compile into a python module:
+
+LDFLAGS="-shared -Wl,-rpath,/home/phil/repos/pythonlibs/thermo" f2py --fcompiler=gfortran -c  -L/home/phil/repos/pythonlibs/thermo -lthermos -m thetawrap thetawrap.f
+
+
+to call from fortran:
+
+from thetawrap import thetawrap
+import numpy as np
+press=np.array([1000.,800.],float)
+temp=np.array([300.,300.],float)
+press=[1000.,800.]
+temp=np.array([300,300.],dtype=np.float32)
+out=np.empty([2,])
+a=thetawrap(press,temp,out,len(out))
+print a,out
+

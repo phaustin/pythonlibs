@@ -1,13 +1,14 @@
 # get temperature and height for one of the mcclatchey standard
 # atmospheres
+# use f2py to produce mccla.so from mcclatchey.f
 #
 #f2py --overwrite-signature -m mccla -h mccla.pyf mcclatchey.f
 #f2py -c mccla.pyf mcclatchey.f
 from scipy.interpolate import interp1d
-from scipy.io import savemat
+#from scipy.io import savemat
 from mccla import mccla
 from thermo import qsat
-np=33
+np=33  #number of points
 height,press,temp,rvapmix,o3den,airden = mccla('midsummer',np)
 import matplotlib.pyplot as plt
 Readme_variables=['height: height [m]','press: pressure [pa]',\
