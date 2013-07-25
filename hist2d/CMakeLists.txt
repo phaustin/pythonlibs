@@ -1,31 +1,33 @@
 project(hist2d)
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_MODULE_PATH "/home/phil/cmake")
+message("system is ${CMAKE_SYSTEM_NAME}")
+set(homedir $ENV{HOME})
+set(CMAKE_MODULE_PATH "${homedir}/cmake")
 set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR}/testlib)
-set(CMAKE_INSTALL_PREFIX /home/phil/lib/python)
-set(CYTHON_CXX_EXTENSION "cxx")
-set(CYTHON_EXECUTABLE "cython")
-
-include(UseCython)
-find_package(PythonLibs27 REQUIRED)
-find_package(Numpy27 REQUIRED)
-include_directories(${PYTHON_INCLUDE_PATH} ${NUMPY_INCLUDE_PATH})
-
-#python executable name
-set(PYTHON python27)
-include_directories(${PYTHON_INCLUDE_PATH} ${NUMPY_INCLUDE_PATH} ${CMAKE_SOURCE_DIR})
-
+set(CMAKE_INSTALL_PREFIX ${homedir}/lib/python)
 set_source_files_properties(
-  ${CMAKE_SOURCE_DIR}/hist2d.pyx
+  ${hist2d_SOURCE_DIR}/hist2d.pyx
   PROPERTIES CYTHON_IS_CXX TRUE )
 
-compile_pyx(hist2d test hist2d.pyx)
-add_custom_target(doit ALL SOURCES ${test})
-message("name of test target: ${test}")
-add_library(hist2d SHARED ${test})
+
+include_directories(${PYTHON_INCLUDE_PATH} ${NUMPY_INCLUDE_PATH} ${CMAKE_SOURCE_DIR})
+include(UseCython)
+message("python is ${PYTHON_EXECUTABLE}")
+
+
+set(CYTHON_CXX_EXTENSION "cxx")
+
+find_package(PythonLibs REQUIRED)
+find_package(Numpy REQUIRED)
+find_package(PyInclude REQUIRED)
+include_directories(${TRUE_PYTHON_INC} ${NUMPY_INCLUDE_PATH} ${hist2d_SOURCE_DIR}})
+
+
+cython_add_module(hist2d hist2d.pyx)
+
 set_target_properties(hist2d PROPERTIES PREFIX "")
 install(TARGETS hist2d LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
 
-add_custom_target(test COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/test_hist.py 
+add_custom_target(test COMMAND ${PYTHON_EXECUTABLE} ${hist2d_SOURCE_DIR}/test_hist.py 
                     hist2d ${LIBRARY_OUTPUT_PATH}
                     DEPENDS hist2d COMMENT "execute test_hist.py")
