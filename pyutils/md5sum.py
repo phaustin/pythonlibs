@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from hashlib import md5
 
 def md5sum(filename, buf_size=8192):

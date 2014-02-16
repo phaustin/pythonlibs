@@ -23,7 +23,7 @@ primary_id='fullpath'
 the_table = db.create_table(table_name)
 the_table=db[table_name]
 
-base='/Users/phil/repos/pythonlibs'
+base='/Users/phil'
 for root, dirs, files in os.walk(base):
     files = [f for f in files if not f[0] == '.']
     dirs[:] = [d for d in dirs if not d[0] == '.']
@@ -38,8 +38,12 @@ for root, dirs, files in os.walk(base):
         uid = fullStats[stat.ST_UID]
         uname=pwd.getpwuid(uid)
         timestamp=fullStats[stat.ST_MTIME]
-        the_date=datetime.fromtimestamp(timestamp)
-        the_table.insert(dict(fullpath=fullpath,date=the_date,owner=uname.pw_name,size=os.path.getsize(fullpath),
+        #the_date=datetime.fromtimestamp(timestamp)
+        try:
+            the_table.insert(dict(fullpath=fullpath,owner=uname.pw_name,
+                              size=os.path.getsize(fullpath),timestamp=timestamp,
                               md5=md5sum(fullpath)))
+        except:
+            pass
         
         
