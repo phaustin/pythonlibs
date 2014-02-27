@@ -4,7 +4,7 @@
    reads sqllite databases created by readlist.py  and readdu.py and writes out
     file information
 
-   example:  retrieve.py files_tera_phil.db phil
+   example:  retrieve_du.py files_tera_phil.db phil
 """
 
 from sqlalchemy import and_
