@@ -1,3 +1,8 @@
+"""
+  write a bash script on roc and
+  run the script on grex using fabric,
+  capturing the output
+"""
 from tempfile import NamedTemporaryFile as mkfile
 from fabric.api import env, run, execute, hide, put, cd
 import textwrap,subprocess,shlex
@@ -71,6 +76,13 @@ if __name__=="__main__":
         find_home=get_home.match(test['grexhome'])
         grex_home=find_home.groups(1)[0].strip()
     #
+    # make a directory to contain the scriptfile on grex
+    #
+    the_command='mkdir -p %s/scriptdir' % grex_home
+    run_command=grex_wrapper(the_command)
+    with hide('output'):
+        test=execute(run_command)
+    #
     #
     # scp the file to grex
     #
@@ -79,7 +91,7 @@ if __name__=="__main__":
     print stdout
     print stderr
     #
-    # run the script using bash
+    # run the script on grex using bash
     #
     the_command='bash %s/scriptdir/scriptfile' % grex_home
     run_command=grex_wrapper(the_command)
