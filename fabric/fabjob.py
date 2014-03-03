@@ -1,8 +1,10 @@
 from tempfile import NamedTemporaryFile as mkfile
 from fabric.api import env, run, execute, hide, put, cd
 import textwrap,subprocess,shlex
+import os
 env.use_ssh_config = True
-env.ssh_config_path='/Users/phil/.ssh/config'
+homedir=os.getenv('HOME')
+env.ssh_config_path='%s/.ssh/config' % homedir
 import StringIO as sio
 
 env.hosts = ['grexhome']
