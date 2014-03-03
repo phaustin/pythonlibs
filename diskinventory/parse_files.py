@@ -3,9 +3,15 @@
 #on osx
 #/usr/local/Cellar/coreutils/8.22/libexec/gnubin/ls
 
+parses the output from:
+
 ls -R -l -Q --time-style=full-iso --time=status /home/phil/*   (file size in bytes)
 
+or
 
+du -k  (file size in kbytes)
+
+and writes to a sqllite table
 
 example:
 

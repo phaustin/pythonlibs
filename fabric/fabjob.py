@@ -6,18 +6,8 @@
 from tempfile import NamedTemporaryFile as mkfile
 from fabric.api import env, run, execute, hide, put, cd
 import textwrap,subprocess,shlex
-import os
-env.use_ssh_config = True
-homedir=os.getenv('HOME')
-env.ssh_config_path='%s/.ssh/config' % homedir
-import re
-
-#
-# this re will extract the home directory
-#
-get_home=re.compile(".*sentry(.*)sentry.*",re.DOTALL)
-
-env.hosts = ['grexhome']
+import os, cStringIO
+from parse_ls import read_ls
 
 def grex_wrapper(command):
     """
@@ -46,16 +36,26 @@ def command(the_command):
             
 
 if __name__=="__main__":
+    env.use_ssh_config = True
+    homedir=os.getenv('HOME')
+    env.ssh_config_path='%s/.ssh/config' % homedir
+    import re
+
+    #
+    # this re will extract the home directory
+    #
+    get_payload=re.compile(".*sentry(.*)sentry.*",re.DOTALL)
+
+    env.hosts = ['grexhome']
 
     #
     # here is the script we want to execute on grex
     #
     the_script=\
     """
-    echo "begin script on grex"
-    echo "hi!!!"
-    echo "I am on grex"
-    echo "arrived safely"
+    echo "sentry"
+    ls -R -l -Q --time-style=full-iso --time=status ~/repos
+    echo "sentry"
     """
     #
     # write the script to a tmpfile
@@ -73,7 +73,7 @@ if __name__=="__main__":
     run_command=grex_wrapper(the_command)
     with hide('output'):
         test=execute(run_command)
-        find_home=get_home.match(test['grexhome'])
+        find_home=get_payload.match(test['grexhome'])
         grex_home=find_home.groups(1)[0].strip()
     #
     # make a directory to contain the scriptfile on grex
@@ -97,8 +97,11 @@ if __name__=="__main__":
     run_command=grex_wrapper(the_command)
     with hide('output'):
         test=execute(run_command)
-        print "dumping the output"
-        print test['grexhome']
+        file_list=get_payload.match(test['grexhome'])
+        file_list=file_list.groups(1)[0].strip()
+        listfile=cStringIO.StringIO(file_list)
+        df=read_ls(listfile)
+    print df.to_string()
 
             
             
