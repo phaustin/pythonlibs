@@ -21,8 +21,8 @@ import dataset, site
 
 def read_ls(listfile,the_table):
     """
-       read lines from dufile and transfer to
-       database du
+       read lines from listfile and transfer to
+       database table the_table
     """
     blanks=re.compile('\s+')
     stripQuotes=re.compile('.*\"(.*)\".*')
@@ -85,7 +85,7 @@ def read_ls(listfile,the_table):
 def read_du(dufile,the_table):
     """
        read lines from dufile and transfer to
-       database du
+       database table the_table
     """
     columnNames=['size','level','directory']
     counter=0
