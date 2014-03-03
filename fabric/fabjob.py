@@ -5,13 +5,18 @@ import os
 env.use_ssh_config = True
 homedir=os.getenv('HOME')
 env.ssh_config_path='%s/.ssh/config' % homedir
-import StringIO as sio
+import re
+
+#
+# this re will extract the home directory
+#
+get_home=re.compile(".*sentry(.*)sentry.*",re.DOTALL)
 
 env.hosts = ['grexhome']
 
 def grex_wrapper(command):
     """
-      create a function that, when called,
+      return a function that, when called,
       runs a shell command using fabric.api.run
       and returns the output
     """
@@ -57,16 +62,26 @@ if __name__=="__main__":
         scriptfile.write(the_script)
         scriptfile.write('\n')
     #
+    # find the HOME directory on grex
+    #
+    the_command='echo "sentry";echo $HOME;echo "sentry"'
+    run_command=grex_wrapper(the_command)
+    with hide('output'):
+        test=execute(run_command)
+        find_home=get_home.match(test['grexhome'])
+        grex_home=find_home.groups(1)[0].strip()
+    #
+    #
     # scp the file to grex
     #
-    the_command="scp %s grexhome:/home/paustin/scriptdir/scriptfile" % scriptfile.name
+    the_command="scp %s grexhome:%s/scriptdir/scriptfile" % (scriptfile.name,grex_home)
     stdout,stderr=command(the_command)
     print stdout
     print stderr
     #
     # run the script using bash
     #
-    the_command='bash /home/paustin/scriptdir/scriptfile'
+    the_command='bash %s/scriptdir/scriptfile' % grex_home
     run_command=grex_wrapper(the_command)
     with hide('output'):
         test=execute(run_command)
