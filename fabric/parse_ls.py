@@ -22,7 +22,7 @@ import cStringIO
 def read_ls(listfile):
     """
        read lines from an open binary python file or itrerable
-       rerun a dataframe with
+       and return a dataframe with
        columnNames=['permission','links','owner','theGroup','size','date','directory','name']
     """
     blanks=re.compile('\s+')
@@ -66,6 +66,7 @@ def read_ls(listfile):
                     permission,links,owner,theGroup,size,date,time,offset =\
                             blanks.split(test.group("left").strip())
                     size=int(size)
+                    #put the split date, time, offset back together for parsing
                     string_date=" ".join([date,time,offset])
                     date_with_tz=du.parse(string_date)
                     date_utc = date_with_tz.astimezone(timezone('UTC'))

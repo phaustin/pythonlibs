@@ -1,7 +1,7 @@
 """
   write a bash script on roc and
   run the script on grex using fabric,
-  capturing the output
+  capturing the output  as a Pandas dataframe
 """
 from tempfile import NamedTemporaryFile as mkfile
 from fabric.api import env, run, execute, hide, put, cd
@@ -91,7 +91,7 @@ if __name__=="__main__":
     print stdout
     print stderr
     #
-    # run the script on grex using bash
+    # run the script we scp'd to scriptfile  on grex using bash
     #
     the_command='bash %s/scriptdir/scriptfile' % grex_home
     run_command=grex_wrapper(the_command)
