@@ -30,13 +30,24 @@ def read_ls(listfile):
     getName=re.compile('(?P<left>.*)\"(?P<name>.*)\".*')
 
     columnNames=['permission','links','owner','theGroup','size','date','directory','name']
-    counter=0
+    counter=-1
     fileList=[]
     for the_line in listfile:
         counter+=1
         newline=the_line.decode('utf8')
+        ## if (counter % 100) == 0:
+        ##     print "counter %d and len fileList %d" % (counter,len(fileList))
+        ##     print "newline: ",newline
         if (counter >= 10000) & (counter % 10000 == 0):
-            print "linecount: ",counter
+            if counter == 10000:
+                df=DataFrame.from_records(fileList)
+                fileList=[]
+                print "initial write at counter %d" % counter
+            else:
+                print "new write at counter %d" % counter
+                print "len fileList %d" % len(fileList)
+                df.append(fileList,ignore_index=True)                        
+                fileList=[]
         newline=newline.strip()
         if len(newline)>0:
             if newline[-1]==":":
@@ -81,7 +92,9 @@ def read_ls(listfile):
                     out=(permission,links,owner,theGroup,size,timestamp,dirname,filename)
                     record=dict(zip(columnNames,out))
                     fileList.append(record)
-    df=DataFrame.from_records(fileList)                        
+    if len(fileList) > 0:
+        print "appending final %d lines" % counter
+        df.append(fileList,ignore_index=True)                        
     return df
 
 if __name__ == "__main__":
