@@ -33,6 +33,7 @@ def read_ls(listfile):
     counter=0
     fileList=[]
     for the_line in listfile:
+        counter+=1
         newline=the_line.decode('utf8')
         if (counter >= 10000) & (counter % 10000 == 0):
             print "linecount: ",counter
@@ -63,8 +64,13 @@ def read_ls(listfile):
                         # we've got a plain file name
                         #
                         filename=test.group("name")
-                    permission,links,owner,theGroup,size,date,time,offset =\
-                            blanks.split(test.group("left").strip())
+                    try:
+                        permission,links,owner,theGroup,size,date,time,offset =\
+                                blanks.split(test.group("left").strip())
+                    except ValueError:
+                        print "failed to split blanks: here s the  problem line: "
+                        print newline
+                        continue
                     size=int(size)
                     #put the split date, time, offset back together for parsing
                     string_date=" ".join([date,time,offset])
@@ -75,7 +81,6 @@ def read_ls(listfile):
                     out=(permission,links,owner,theGroup,size,timestamp,dirname,filename)
                     record=dict(zip(columnNames,out))
                     fileList.append(record)
-                    counter+=1
     df=DataFrame.from_records(fileList)                        
     return df
 
