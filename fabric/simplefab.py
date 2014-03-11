@@ -20,7 +20,7 @@ if __name__=="__main__":
     env.hosts = ['roc.eos.ubc.ca']
     env.user = 'phil'
     #env.use_ssh_config = True
-    env.password="fdLfums!"
+    env.password="password"
     homedir=os.getenv('HOME')
     env.ssh_config_path='%s/.ssh/config' % homedir
     print "config is at: ",env.ssh_config_path
