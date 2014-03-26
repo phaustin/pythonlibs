@@ -1,0 +1,21 @@
+pwd
+/tera/phil/austinp/repos/SAM6.8.2
+
+git add .
+
+commit
+
+untar sam6.9.5.tgz 
+
+python add_remove.py /tera/phil/austinp/repos/SAM6.9.6 /tera/phil/austinp/repos/SAM6.8.2
+
+bash copy.sh
+commit
+overwrite.sh
+commit
+remove.sh
+commit
+
+python confirm_trans.py /tera/phil/austinp/repos/SAM6.9.6 /tera/phil/austinp/repos/SAM6.8.2
+
+should show they are now identical
