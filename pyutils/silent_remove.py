@@ -10,7 +10,7 @@ def silent_remove(filename):
         if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
             raise # re-raise exception if a different error occured
 
-def new_dir(the_dir)
+def new_dir(the_dir):
     """create a directory without failure if
        directory already exists
     """
@@ -19,3 +19,4 @@ def new_dir(the_dir)
     except OSError, e:
         if e.errno != errno.EEXIST:
             raise  #re-raise if different error occured
+    return None
