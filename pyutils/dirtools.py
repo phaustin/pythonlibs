@@ -17,6 +17,5 @@ def new_dir(the_dir):
     try:
         os.makedirs(the_dir)
     except OSError, e:
-        if e.errno != errno.EEXIST:
-            raise  #re-raise if different error occured
-    return None
+        if e.errno == errno.EEXIST:
+            pass  #not a problem if file exists
