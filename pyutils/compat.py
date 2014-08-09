@@ -16,7 +16,10 @@ if not PY2:
     izip = zip
     import mutagenx
     from mutagenx.easymp4 import EasyMP4
-    from mutagenx.mp3 import EasyMP3
+    from mutagenx.mp4 import MP4
+    from mutagenx.mp3 import EasyMP3,MP3
+    from mutagenx.mp3 import HeaderNotFoundError
+    
     mutagen=mutagenx
     
 else:
@@ -26,7 +29,9 @@ else:
     string_types = (str, unicode)
     import mutagen
     from mutagen.easymp4 import EasyMP4
-    from mutagen.mp3 import EasyMP3
+    from mutagen.mp4 import MP4
+    from mutagen.mp3 import EasyMP3,MP3
+    from mutagen.mp3 import HeaderNotFoundError
 
     def implements_to_string(cls):
         cls.__unicode__ = cls.__str__
