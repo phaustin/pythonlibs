@@ -14,24 +14,30 @@ if not PY2:
     ifilter = filter
     imap = map
     izip = zip
-    import mutagenx
-    from mutagenx.easymp4 import EasyMP4
-    from mutagenx.mp4 import MP4
-    from mutagenx.mp3 import EasyMP3,MP3
-    from mutagenx.mp3 import HeaderNotFoundError
-    
-    mutagen=mutagenx
+    try:
+        import mutagenx
+        from mutagenx.easymp4 import EasyMP4
+        from mutagenx.mp4 import MP4
+        from mutagenx.mp3 import EasyMP3,MP3
+        from mutagenx.mp3 import HeaderNotFoundError
+
+        mutagen=mutagenx
+    except ImportError:
+        pass
     
 else:
     unichr = unichr
     text_type = unicode
     range_type = xrange
     string_types = (str, unicode)
-    import mutagen
-    from mutagen.easymp4 import EasyMP4
-    from mutagen.mp4 import MP4
-    from mutagen.mp3 import EasyMP3,MP3
-    from mutagen.mp3 import HeaderNotFoundError
+    try:
+        import mutagen
+        from mutagen.easymp4 import EasyMP4
+        from mutagen.mp4 import MP4
+        from mutagen.mp3 import EasyMP3,MP3
+        from mutagen.mp3 import HeaderNotFoundError
+    except ImportError:
+        pass
 
     def implements_to_string(cls):
         cls.__unicode__ = cls.__str__
