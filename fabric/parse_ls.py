@@ -12,19 +12,48 @@ and returns items as a pandas dataframe with
 columnNames=['permission','links','owner','theGroup','size','date','directory','name']
 
 """
+from __future__ import print_function, unicode_literals
+from sqlalchemy.orm import sessionmaker
+import dataset
 import re,os
 import dateutil.parser as du
 from pytz import timezone
 import datetime as dt
 from pandas import DataFrame
+import pandas as pd
 import cStringIO
 
-def read_ls(listfile):
+def get_frame_from_query(the_query):
+    """make a dataframe from an sqlalchemy query"""
+    colnames=[col['name'] for col in the_query.column_descriptions]
+    df=DataFrame.from_records(list(the_query),columns=colnames)
+    return df
+
+def get_df_from_table(db,tablename):
+    session=sessionmaker(bind=db.engine)
+    thesession=session()
+    the_table=db.metadata.tables[tablename]
+    all_columns=thesession.query(the_table)
+    df=get_frame_from_query(all_columns)
+    thesession.close()
+    return df
+
+def read_ls(listfile,dbname):
     """
        read lines from an open binary python file or itrerable
        and return a dataframe with
        columnNames=['permission','links','owner','theGroup','size','date','directory','name']
     """
+    dbstring='sqlite:///{:s}'.format(dbname)
+    db = dataset.connect(dbstring)
+    table_name='filelist'
+    if table_name in db.tables:
+        print("dropping table {}".format(table_name))
+        db[table_name].drop()
+        db.engine.connect().close()
+        db = dataset.connect(dbstring)
+    the_table = db.create_table(table_name)
+
     blanks=re.compile('\s+')
     stripQuotes=re.compile('.*\"(.*)\".*')
     getName=re.compile('(?P<left>.*)\"(?P<name>.*)\".*')
@@ -32,21 +61,17 @@ def read_ls(listfile):
     columnNames=['permission','links','owner','theGroup','size','date','directory','name']
     counter=-1
     fileList=[]
-    for the_line in listfile:
+    for the_line in listfile.readlines():
         counter+=1
         newline=the_line.decode('utf8')
         ## if (counter % 100) == 0:
         ##     print "counter %d and len fileList %d" % (counter,len(fileList))
         ##     print "newline: ",newline
         if (counter >= 10000) & (counter % 10000 == 0):
-            if counter == 10000:
-                df=DataFrame.from_records(fileList)
-                fileList=[]
-                print "initial write at counter %d" % counter
-            else:
-                print "new write at counter %d" % counter
-                print "len fileList %d" % len(fileList)
-                df.append(fileList,ignore_index=True)                        
+                print("new write at counter %d" % counter)
+                print('line 1 of filelist: ',fileList[0])
+                print("len fileList %d" % len(fileList))
+                the_table.insert_many(fileList)
                 fileList=[]
         newline=newline.strip()
         if len(newline)>0:
@@ -79,8 +104,8 @@ def read_ls(listfile):
                         permission,links,owner,theGroup,size,date,time,offset =\
                                 blanks.split(test.group("left").strip())
                     except ValueError:
-                        print "failed to split blanks: here s the  problem line: "
-                        print newline
+                        print("failed to split blanks: here s the  problem line: ")
+                        print(newline)
                         continue
                     size=int(size)
                     #put the split date, time, offset back together for parsing
@@ -93,9 +118,9 @@ def read_ls(listfile):
                     record=dict(zip(columnNames,out))
                     fileList.append(record)
     if len(fileList) > 0:
-        print "appending final %d lines" % counter
-        df.append(fileList,ignore_index=True)                        
-    return df
+        print("appending final %d lines" % counter)
+        the_table.insert_many(fileList)
+    return db
 
 if __name__ == "__main__":
     from tempfile import NamedTemporaryFile as mkfile
@@ -151,8 +176,11 @@ if __name__ == "__main__":
     the_list=textwrap.dedent(sample_list)
     the_list=the_list.strip()
     listfile=cStringIO.StringIO(the_list)
-    df=read_ls(listfile)    
-    print df.to_string()
+    dbname='newroc.db'
+    db=read_ls(listfile,dbname)
+    tablename='filelist'
+    df=get_df_from_table(db,tablename)
+    print(df.to_string())
                     
 
                     
