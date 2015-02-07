@@ -1,3 +1,5 @@
+#to run: python setup_hist.py build_ext --inplace  (osx, linux)
+#        python setup_fast.py build_ext --inplace --compiler=mingw32  (windows)
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
