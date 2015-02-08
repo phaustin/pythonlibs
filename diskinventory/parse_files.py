@@ -28,6 +28,7 @@ from pandas import DataFrame, Series
 import dataset, site
 from six.moves import zip
 
+blocksize=50000
 def read_ls(listfile,the_table):
     """
        read lines from listfile and transfer to
@@ -40,12 +41,15 @@ def read_ls(listfile,the_table):
     columnNames=['permission','links','owner','theGroup','size','date','directory','name']
 
     with open(listfile,'rb') as f:
+        errlist=[]
         counter=0
-        fileList=[]
+        collect=[]
         for the_line in f:
             newline=the_line.decode('utf8')
-            if (counter >= 10000) & (counter % 10000 == 0):
+            if (counter > 0) & (counter % blocksize == 0):
                 print("linecount: ",counter)
+                the_table.insert_many(collect)                                
+                collect=[]
             newline=newline.strip()
             if len(newline)>0:
                 if newline[-1]==":":
@@ -73,8 +77,23 @@ def read_ls(listfile,the_table):
                             # we've got a plain file name
                             #
                             filename=test.group("name")
-                        permission,links,owner,theGroup,size,date,time,offset =\
-                                blanks.split(test.group("left").strip())
+                        try:
+                            permission,links,owner,theGroup,size,date,time,offset =\
+                                    blanks.split(test.group("left").strip())
+                        except ValueError:
+                            saveit=dict(newline=newline,splitout=repr(blanks.split(test.group("left").strip())),
+                                        dirname=dirname,filename=filename,counter=counter)
+                            errmsg=\
+                                """
+                                  __________
+                                  caught ValueError trying to split {newline:s}
+                                  output of split is {splitout:s}
+                                  filename is {dirname:s}/{filename:s}
+                                  counter value is {counter:d}
+                                  __________
+                                """.format(**saveit)
+                            errlist.append(errmsg)
+                            continue
                         size=int(size)
                         string_date=" ".join([date,time,offset])
                         date_with_tz=du.parse(string_date)
@@ -82,13 +101,15 @@ def read_ls(listfile,the_table):
                         timestamp=int(date_utc.strftime('%s'))
                         #columnNames=['permission','links','owner','theGroup','size','date','directory','name']
                         out=(permission,links,owner,theGroup,size,timestamp,dirname,filename)
-                        record=dict(list(zip(columnNames,out)))
-                        the_table.insert(record)                                
+                        collect.append(dict(list(zip(columnNames,out))))
                         ## print string_date
                         ## print date_utc
                         ## print dt.datetime.fromtimestamp(timestamp)
                         counter+=1
-    return counter
+        if len(collect) != 0:
+            print('inserting final {} lines'.format(len(collect)))
+            the_table.insert_many(collect)
+    return counter,errlist
 
 
 def read_du(dufile,the_table):
@@ -98,20 +119,25 @@ def read_du(dufile,the_table):
     """
     columnNames=['size','level','directory']
     counter=0
+    collect=[]
     with open(dufile,'rb') as f:
         for the_line in f:
             #print(counter)
-            if counter % 1000 == 0:
+            if (counter > 0) & (counter % blocksize == 0):
                 print("linecount: ",counter)
+                the_table.insert_many(collect)
+                collect=[]
             newline=the_line.decode('utf8')
             newline=newline.strip()
             size,direc=newline.split('\t',1)
             size=int(size)
             level=direc.count('/')
             out=(size,level,direc)
-            record=dict(list(zip(columnNames,out)))
-            the_table.insert(record)                                
+            collect.append(dict(list(zip(columnNames,out))))
             counter+=1
+    if len(collect) != 0:
+        print('inserting final {} lines'.format(len(collect)))
+        the_table.insert_many(collect)                                
     return counter
 
 
