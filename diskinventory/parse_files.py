@@ -18,12 +18,15 @@ example:
 parse_files.py du_list.txt ls_list.txt
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 import re,os
 import dateutil.parser as du
 from pytz import timezone
 import datetime as dt
 from pandas import DataFrame, Series
 import dataset, site
+from six.moves import zip
 
 def read_ls(listfile,the_table):
     """
@@ -42,7 +45,7 @@ def read_ls(listfile,the_table):
         for the_line in f:
             newline=the_line.decode('utf8')
             if (counter >= 10000) & (counter % 10000 == 0):
-                print "linecount: ",counter
+                print("linecount: ",counter)
             newline=newline.strip()
             if len(newline)>0:
                 if newline[-1]==":":
@@ -79,7 +82,7 @@ def read_ls(listfile,the_table):
                         timestamp=int(date_utc.strftime('%s'))
                         #columnNames=['permission','links','owner','theGroup','size','date','directory','name']
                         out=(permission,links,owner,theGroup,size,timestamp,dirname,filename)
-                        record=dict(zip(columnNames,out))
+                        record=dict(list(zip(columnNames,out)))
                         the_table.insert(record)                                
                         ## print string_date
                         ## print date_utc
@@ -99,14 +102,14 @@ def read_du(dufile,the_table):
         counter=0
         for the_line in f:
             if counter % 10000 == 0:
-                print "linecount: ",counter
+                print("linecount: ",counter)
             newline=the_line.decode('utf8')
             newline=newline.strip()
             size,direc=newline.split('\t',1)
             size=int(size)
             level=direc.count('/')
             out=(size,level,direc)
-            record=dict(zip(columnNames,out))
+            record=dict(list(zip(columnNames,out)))
             the_table.insert(record)                                
             counter+=1
     return counter
@@ -131,8 +134,8 @@ if __name__ == "__main__":
     dbstring='sqlite:///{:s}'.format(dbname)
     silent_remove(dbname)
 
-    print "reading file: ",dufile
-    print "writing file: ",dbname
+    print("reading file: ",dufile)
+    print("writing file: ",dbname)
     db = dataset.connect(dbstring)
 
     table_name='direcs'
@@ -140,7 +143,7 @@ if __name__ == "__main__":
     the_table=db[table_name]
 
     counter=read_du(dufile,the_table)
-    print "total lines: ",counter
+    print("total lines: ",counter)
 
     listfile=args.listname[0]
     head,ext=os.path.splitext(listfile)
@@ -148,8 +151,8 @@ if __name__ == "__main__":
     dbstring='sqlite:///{:s}'.format(dbname)
     silent_remove(dbname)
 
-    print "reading file: ",listfile
-    print "writing file: ",dbname
+    print("reading file: ",listfile)
+    print("writing file: ",dbname)
     db = dataset.connect(dbstring)
 
     table_name='files'
@@ -157,7 +160,7 @@ if __name__ == "__main__":
     the_table=db[table_name]
 
     counter=read_ls(listfile,the_table)
-    print "total lines: ",counter
+    print("total lines: ",counter)
                                   
                     
 

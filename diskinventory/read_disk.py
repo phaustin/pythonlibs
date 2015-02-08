@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env /Users/phil/miniconda3/bin/python
 """
  do a ls and adu of a file tree and save the output, converting
  the output files into two sql databases
@@ -26,6 +26,8 @@ will make stdout and stderr files for two processes:
  with tables 'direcs' and 'files'
  
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import argparse, textwrap
 import subprocess,shlex
@@ -48,6 +50,7 @@ args=parser.parse_args()
 
 root_dict=dict(root=args.root[0])
 command_string="ls -R -l -Q --time-style=full-iso --time=status {root:s}"
+command_string="gls -R -l -Q --time-style=full-iso --time=status {root:s}"
 
 basename=args.outfile_base[0]
 head,base=os.path.split(basename)
@@ -58,26 +61,27 @@ errfile='%s/ls_%s_err.txt' % (head,base)
 ls_outfile='%s/ls_%s.txt' % (head,base)
 
 command=command_string.format(**root_dict)
-print "executing: ",command
-print "stdout and stderr set to: ",ls_outfile,errfile
+print("executing: ",command)
+print("stdout and stderr set to: ",ls_outfile,errfile)
 
 try:
     with open(ls_outfile,'w') as stdout:
         with open(errfile,'w') as stderr:
                   subprocess.check_call(shlex.split(command),stderr=stderr,stdout=stdout)
 except subprocess.CalledProcessError:
-    print "ls command reported some errors"
-    print "command: ",command
+    print("ls command reported some errors")
+    print("command: ",command)
     with open(errfile) as f:
         errout=f.readlines()
-    print "err messages: "
-    print " ".join(errout)
+    print("err messages: ")
+    print(" ".join(errout))
 
 errfile='%s/du_%s_err.txt' % (head,base)
 du_outfile='%s/du_%s.txt' % (head,base)
 
 
 command_string='du -k {root:s}'
+command_string='gdu -k {root:s}'
 command=command_string.format(**root_dict)
 
 try:
@@ -85,35 +89,35 @@ try:
         with open(errfile,'w') as stderr:
                   subprocess.check_call(shlex.split(command),stderr=stderr,stdout=stdout)
 except subprocess.CalledProcessError:
-    print "du command reported some errors"
-    print "command: ",command
+    print("du command reported some errors")
+    print("command: ",command)
     with open(errfile) as f:
         errout=f.readlines()
-    print "err messages: "
-    print " ".join(errout)
+    print("err messages: ")
+    print(" ".join(errout))
 
-print "executing: ",command
-print "stdout and stderr set to: ",du_outfile,errfile
+print("executing: ",command)
+print("stdout and stderr set to: ",du_outfile,errfile)
 
 dbname="%s/files_%s.db" % (head,base)
 dbstring='sqlite:///{:s}'.format(dbname)
 silent_remove(dbname)
 db = dataset.connect(dbstring)
-print "created %s" % dbname
+print("created %s" % dbname)
 
 table_name='direcs'
 the_table = db.create_table(table_name)
 the_table=db[table_name]
 
 counter=read_du(du_outfile,the_table)
-print "total lines: read from %s=%d" % (du_outfile,counter)
+print("total lines: read from %s=%d" % (du_outfile,counter))
 
 table_name='files'
 the_table = db.create_table(table_name)
 the_table=db[table_name]
 
 counter=read_ls(ls_outfile,the_table)
-print "total lines: read from %s=%d" % (ls_outfile,counter)
+print("total lines: read from %s=%d" % (ls_outfile,counter))
 
 
 

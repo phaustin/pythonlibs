@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import os,errno
 def silent_remove(filename):
     """remove a directory without failure
        if directory doesn't exist
     """
-    print("{:s} will be destroyed if it exists".format(filename))
+    print(("{:s} will be destroyed if it exists".format(filename)))
     try:
         os.remove(filename)
     except OSError as e:
@@ -16,7 +18,7 @@ def new_dir(the_dir):
     """
     try:
         os.makedirs(the_dir)
-    except OSError, e:
+    except OSError as e:
         if e.errno != errno.EEXIST:
             raise  #re-raise if different error occured
     return None
