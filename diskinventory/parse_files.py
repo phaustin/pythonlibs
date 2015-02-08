@@ -99,9 +99,9 @@ def read_du(dufile,the_table):
     columnNames=['size','level','directory']
     counter=0
     with open(dufile,'rb') as f:
-        counter=0
         for the_line in f:
-            if counter % 10000 == 0:
+            #print(counter)
+            if counter % 1000 == 0:
                 print("linecount: ",counter)
             newline=the_line.decode('utf8')
             newline=newline.strip()
