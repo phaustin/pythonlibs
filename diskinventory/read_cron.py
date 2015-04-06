@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-./read_cron.py tera
+./read_cron.py tera .
 
 or newtera or short or users
 
@@ -39,17 +39,16 @@ from pythonlibs.diskinventory.parse_files import read_du,read_ls
 linebreaks=argparse.RawTextHelpFormatter
 descrip=textwrap.dedent(globals()['__doc__'])
 parser = argparse.ArgumentParser(formatter_class=linebreaks,description=descrip)
-parser.add_argument('root', nargs=1, type=str,help='name of root directory (tera, newtera or users')
-parser.add_argument('outdir', nargs=1,type=str,help='output directory')
+parser.add_argument('root',  type=str,help='name of root directory (tera, newtera or users')
+parser.add_argument('outdir',type=str,help='output directory')
 args=parser.parse_args()
 
-namedict=dict(outdir=args.outdir[0],root=args.root[0])
-
+namedict=dict(outdir=args.outdir,root=args.root)
 
 dbname="{outdir:s}/files_{root:s}.db".format(**namedict)
 dbstring='sqlite:///{:s}'.format(dbname)
-du_outfile="du_{root:s}.txt".format(**namedict)
-ls_outfile="ls_{root:s}.txt".format(**namedict)
+du_outfile="/backupspace/stats_newroc/du_{root:s}.txt".format(**namedict)
+ls_outfile="/backupspace/stats_newroc/ls_{root:s}.txt".format(**namedict)
 silent_remove(dbname)
 db = dataset.connect(dbstring)
 print("created %s" % dbname)

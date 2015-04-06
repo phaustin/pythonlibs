@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 #on osx
 #/usr/local/Cellar/coreutils/8.22/libexec/gnubin/ls
@@ -27,6 +27,7 @@ import datetime as dt
 from pandas import DataFrame, Series
 import dataset, site
 from six.moves import zip
+import hashlib
 
 blocksize=50000
 def read_ls(listfile,the_table):
@@ -38,14 +39,13 @@ def read_ls(listfile,the_table):
     stripQuotes=re.compile('.*\"(.*)\".*')
     getName=re.compile('(?P<left>.*)\"(?P<name>.*)\".*')
 
-    columnNames=['permission','links','owner','theGroup','size','date','directory','name']
+    columnNames=['permission','links','owner','theGroup','size','date','directory','name','hash']
 
-    with open(listfile,'rb') as f:
+    with open(listfile,'r',encoding='utf-8') as f:
         errlist=[]
         counter=0
         collect=[]
-        for the_line in f:
-            newline=the_line.decode('utf8')
+        for newline in f:
             if (counter > 0) & (counter % blocksize == 0):
                 print("linecount: ",counter)
                 the_table.insert_many(collect)                                
@@ -80,6 +80,7 @@ def read_ls(listfile,the_table):
                         try:
                             permission,links,owner,theGroup,size,date,time,offset =\
                                     blanks.split(test.group("left").strip())
+                            the_hash=hashlib.sha256('{}/{}'.format(dirname,filename).encode('utf-8')).hexdigest()
                         except ValueError:
                             saveit=dict(newline=newline,splitout=repr(blanks.split(test.group("left").strip())),
                                         dirname=dirname,filename=filename,counter=counter)
@@ -99,8 +100,8 @@ def read_ls(listfile,the_table):
                         date_with_tz=du.parse(string_date)
                         date_utc = date_with_tz.astimezone(timezone('UTC'))
                         timestamp=int(date_utc.strftime('%s'))
-                        #columnNames=['permission','links','owner','theGroup','size','date','directory','name']
-                        out=(permission,links,owner,theGroup,size,timestamp,dirname,filename)
+                        #columnNames=['permission','links','owner','theGroup','size','date','directory','name','hash']
+                        out=(permission,links,owner,theGroup,size,timestamp,dirname,filename,the_hash)
                         collect.append(dict(list(zip(columnNames,out))))
                         ## print string_date
                         ## print date_utc
@@ -120,14 +121,13 @@ def read_du(dufile,the_table):
     columnNames=['size','level','directory']
     counter=0
     collect=[]
-    with open(dufile,'rb') as f:
-        for the_line in f:
+    with open(dufile,'r',encoding='utf-8') as f:
+        for newline in f:
             #print(counter)
             if (counter > 0) & (counter % blocksize == 0):
                 print("linecount: ",counter)
                 the_table.insert_many(collect)
                 collect=[]
-            newline=the_line.decode('utf8')
             newline=newline.strip()
             size,direc=newline.split('\t',1)
             size=int(size)
