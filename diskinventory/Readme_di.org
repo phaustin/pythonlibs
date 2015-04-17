@@ -1,22 +1,22 @@
 Disk inventory code
 ___________________
 
+/etc/cron.daily/backup  on roc
+/etc/cron.daily/rdiff_backups.sh on kite
 
 1) Running ls and du to get file information
 
-  ./read_disk.py /tera/phil /home/phil/ls_tera_phil
+  ./read_cron.py tera /tera/phil/diskinventory/
 
-  will produce::
+  will produce read du_tera* and ls_tera* from 
+  /backupspace/stats_newroc and produce 
 
+  /tera/phil/diskinventory/files_tera_phil.db
 
-    /home/phil/ls_tera_phil.txt
-    /home/phil/ls_tera_phil_err.txt
-    /home/phil/du_tera_phil.txt
-    /home/phil/du_tera_phil_err.txt
- 
-  and the read the two txt files to produce::
-
-    files_tera_phil.db
+contains two tables
+direcs:    columnNames=['size','level','directory']
+files:     columnNames=['permission','links','owner','theGroup','size','date','directory','name','hash']
 
 
+python3 retrieve.py /tera/phil/diskinventory/files_tera.db phil
 
