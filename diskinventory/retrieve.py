@@ -6,6 +6,7 @@
 
    example:  retrieve.py files_tera_phil.db phil
 """
+from __future__ import print_function
 
 from sqlalchemy import and_
 from sqlalchemy.orm import sessionmaker
@@ -46,11 +47,13 @@ else:
 #sys.exit(0)
 
 dbstring='sqlite:///{:s}'.format(file_db)
+print(dbstring)
 db = dataset.connect(dbstring)
 session=sessionmaker(bind=db.engine)
 thesession=session()
 file_table=db.metadata.tables['files']
 direc_table=db.metadata.tables['direcs']
+print(db.metadata.tables)
 
 large_query=thesession.query(file_table).filter(and_(file_table.c.size > size,file_table.c.owner==owner,\
                                                      file_table.c.date < older_than))
@@ -69,19 +72,19 @@ out=df_direcs[hit]
 report=out[['directory','size']]
 report=report.sort(columns='size',ascending=False)
 report['size']=report['size']*1.e-6
-print report['size'].sum()
+print(report['size'].sum())
 
-print report.to_string()
+print(report.to_string())
 
 
 for id,row in report.iterrows():
     left_size=len(row['directory'])
     padding=70-left_size
     row['space']=' '*padding
-    print "{directory:s}:{space:s}{size:>6.3f}".format(**row)
+    print("{directory:s}:{space:s}{size:>6.3f}".format(**row))
 
 
 for id,row in report.iterrows():
     left_size=len(row['directory'])
-    print "rm -rf {directory:s}".format(**row)
+    print("rm -rf {directory:s}".format(**row))
     
