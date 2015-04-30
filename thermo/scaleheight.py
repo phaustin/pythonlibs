@@ -1,9 +1,11 @@
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
-import mcclatchey
+import mccla as m
 import matplotlib.ticker as ticks
 import pdb
+#f2py --overwrite-signature -m mccla -h mccla.pyf mcclatchey.f
+#f2py -c mccla.pyf mcclatchey.f
 
 g=9.8
 Rd=287.
@@ -29,7 +31,8 @@ def calcDensHeight(T,p,z):
     return oneOverHbar
 
  
-z,press,Temp,rvden,o3den,den = mcclatchey.mccla('midsummer',33)
+#z,press,Temp,rvden,o3den,den = m.mccla('midsummer',33)
+z,press,Temp,rvden,o3den,den = m.mccla('tropics',33)
 Hbar0 = 1./calcScaleHeight(Temp,press,z)
 hit=z<10000.
 zL,pressL,TempL=(z[hit],press[hit],Temp[hit])
@@ -52,7 +55,7 @@ theAx.set_yticks(tickvals)
 majorFormatter = ticks.FormatStrFormatter('%d')
 theAx.yaxis.set_major_formatter(majorFormatter)
 theAx.set_yticklabels(tickvals)
-theAx.set_ylim([1000.,50.])
+theAx.set_ylim([1000.,5.])
 theAx.set_title('Midlatitude summer profile')
 theAx.set_xlabel('Temperature (K)')
 theAx.set_ylabel('pressure (hPa)')
@@ -95,7 +98,7 @@ plt.show()
 
 for key,theFig in keepFigs.items():
    fignum,figName=key
-   figName='../png/%s.png' % figName
+   figName='./png/%s.png' % figName
    theFig.canvas.draw()
    theFig.savefig(figName)
 

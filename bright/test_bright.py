@@ -29,7 +29,7 @@ def calc_diff(channum):
     #
     np.testing.assert_array_almost_equal(theTemps,newTemps)
 
-def test20():
+Def test20():
     calc_diff(20)
 
 def test29():

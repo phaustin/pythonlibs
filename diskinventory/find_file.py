@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
   read file database and find a file by string/name
 """
@@ -34,7 +35,7 @@ if __name__=="__main__":
     thesession=session()
     file_table=the_db.metadata.tables['files']
     the_query=thesession.query(file_table.c.directory,file_table.c.name).\
-      filter(file_table.c.name.like('%scm15h%'))
+      filter(file_table.c.name.like('%test_for_phil%'))
     df=get_frame_from_query(the_query)
     print df.to_string()
 
