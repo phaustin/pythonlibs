@@ -19,12 +19,15 @@ import os,site
 home_dir=os.getenv('HOME')
 site.addsitedir('%s/repos' % home_dir)
 import pdb
+from textwrap import dedent
 
 from pythonlibs.pyutils.bitly_helper import get_connection
 
+#
+# assumes utf-8 so ascii characters between 0-127
+#
 def ascii_filt(my_string):
     return ''.join([i for i in my_string if ord(i) < 128])
-
 
 bitly_conn=get_connection()
 
@@ -64,7 +67,10 @@ for arg in sys.argv[1:]:
     # download the xml
     import urllib
     from xml.dom import minidom
-    usock = urllib.request.urlopen('http://www.crossref.org/openurl/?id=doi:'+doi+'&noredirect=true&pid='+crossref_api_key+'&format=unixref')
+    line_dict=dict(doi=doi,crossref_api_key=crossref_api_key)
+    text='http://www.crossref.org/openurl/?id=doi:{doi}&noredirect=true&pid={crossref_api_key}&format=unixref'
+    text=text.format(**line_dict)
+    usock = urllib.request.urlopen(text)
     xmldoc = minidom.parse(usock)
     usock.close()
  
@@ -153,22 +159,39 @@ for arg in sys.argv[1:]:
     # output
 
     ascii_author=ascii_filt(text_first_author_surname)
-    print("@ARTICLE{"+ascii_author+text_year[-2:]+",")
-    print("author = {"+" and ".join(authorlist)+"},")
-    print("title = {"+text_title+"},")
-    print("journal = {"+abbrev_journal_title+"},")
+    authorlist=" and ".join(authorlist)
+    line_dict=dict(ascii_author=ascii_author,authorlist=authorlist,
+                   text_title=text_title,abbrev_journal_title=abbrev_journal_title,
+                   volume=text_volume,issue=text_issue,year=text_year[-2:],
+                   text_first_page=text_first_page,text_last_page=text_last_page,doi=doi,resource=resource,
+                   wos_url=wos_url,citing_url=citing_url,related_url=related_url)
+    text="""
+    @ARTICLE{{{ascii_author:}{year},
+    author = {{{authorlist}}},"
+    title = {{{text_title}}},"
+    journal = {{{abbrev_journal_title}}},"
+    """
+    text=dedent(text)
+    text=text.strip()
+    print(text.format(**line_dict))
     if not text_volume == "":
-        print("volume = {"+text_volume+"},")
+        print("volume = {{{volume}}},".format(**line_dict))
     if not text_issue == "":
-        print("number = {"+text_issue+"},")
-    print("year = {"+text_year+"},")
+        print("issue = {{{issue}}},".format(**line_dict))
+    print("year = {{{year}}},".format(**line_dict))
     if ((text_first_page != "") and (text_last_page != "")):
-        print("pages = {"+text_first_page+"-"+text_last_page+"},")
+        print("pages = {{{text_first_page}-{text_last_page}}},".format(**line_dict))
     if ((text_first_page != "") and (text_last_page == "")):
-        print("pages = {"+text_first_page+"},")
-    print("doi = {"+doi+"},")
-    print("resource = {http://ezproxy.library.ubc.ca/login?url="+resource+"},")
-    print("wos = {{{}}},".format(wos_url))
-    print("citing = {{{}}},".format(citing_url))
-    print("related = {{{}}},".format(related_url))
-    print("}")
+        print("pages = {{{text_first_page}}},".format(**line_dict))
+    text="""
+    doi = {{{doi}}},
+    resource = {{http://ezproxy.library.ubc.ca/login?url={resource}}},
+    wos = {{{wos_url}}},
+    citing = {{{citing_url}}},
+    related = {{{related_url}}},
+    }}
+    """
+    text=dedent(text)
+    text=text.strip()
+    print(text.format(**line_dict))
+    
