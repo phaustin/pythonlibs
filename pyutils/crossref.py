@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+
+crossref.py 10.1021/jp047349j
 
 ## In [7]: print sys.stdout.encoding
 ## ------> print(sys.stdout.encoding)
@@ -11,8 +14,8 @@
 # then becomes your api key for requests via http://help.crossref.org/using_http
 #
 
-# crossref.py 10.1021/jp047349j
 # http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info:doi/10.1021/jp047349j
+"""
 
 from __future__ import print_function
 import os,site
@@ -20,6 +23,7 @@ home_dir=os.getenv('HOME')
 site.addsitedir('%s/repos' % home_dir)
 import pdb
 from textwrap import dedent
+import argparse
 
 from pythonlibs.pyutils.bitly_helper import get_connection
 
@@ -38,7 +42,14 @@ crossref_api_key = 'paustin@eos.ubc.ca'
 # get the doi
 import sys
 
-for arg in sys.argv[1:]:
+linebreaks=argparse.RawTextHelpFormatter
+descrip=dedent(globals()['__doc__'])
+parser = argparse.ArgumentParser(formatter_class=linebreaks,description=descrip)
+parser.add_argument('dois',nargs='+',type=str,help='one or more dois')
+args=parser.parse_args()
+
+
+for arg in args.dois:
     arg = arg.strip()
     arg = arg.strip("doi:")
     arg = arg.strip("http://")
