@@ -80,9 +80,9 @@ for arg in args.dois:
     arg = arg.strip("dx.doi.org/")
     doi = arg.strip()
 
-    wos_url=r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info:doi/{}".format(doi)
-    citing_url=r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info%3Adoi%2F{}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&svc.citing=yes".format(doi)
-    related_url=r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info%3Adoi%2F{}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&svc.related=yes'.format(doi)
+    wos_url=r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info:doi/{doi:s}".format(doi=doi)
+    citing_url=r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&svc.citing=yes".format(doi=doi)
+    related_url=r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&svc.related=yes'.format(doi=doi)
 
     wos_url=bitly_conn.shorten(wos_url)['url']
     citing_url=bitly_conn.shorten(citing_url)['url']
