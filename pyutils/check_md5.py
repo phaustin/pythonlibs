@@ -12,20 +12,23 @@ def find_md5(the_map,seek_point,buf_length):
     return m.hexdigest()
 
 def check_md5(filename,buf_length):
-    with open(filename,"rb") as infile:
-        with closing(mmap.mmap(infile.fileno(),0,access=mmap.ACCESS_READ)) as the_map:
-            file_size=the_map.size()
-            if file_size > 3*buf_length:
-                start_seek=0
-                mid_seek=int(file_size/2)
-                end_seek=file_size - buf_length
-            else:
-                start_seek=0
-                mid_seek=0
-                end_seek=0
-            start_hex=find_md5(the_map,start_seek,buf_length)
-            mid_hex=find_md5(the_map,mid_seek,buf_length)
-            end_hex=find_md5(the_map,end_seek,buf_length)
+    try:
+        with open(filename,"rb") as infile:
+            with closing(mmap.mmap(infile.fileno(),0,access=mmap.ACCESS_READ)) as the_map:
+                file_size=the_map.size()
+                if file_size > 3*buf_length:
+                    start_seek=0
+                    mid_seek=int(file_size/2)
+                    end_seek=file_size - buf_length
+                else:
+                    start_seek=0
+                    mid_seek=0
+                    end_seek=0
+                start_hex=find_md5(the_map,start_seek,buf_length)
+                mid_hex=find_md5(the_map,mid_seek,buf_length)
+                end_hex=find_md5(the_map,end_seek,buf_length)
+    except:
+        file_size,start_hex,mid_hex,end_hex=(-1,'bad','bad','bad')
     return (file_size,start_hex,mid_hex,end_hex)
 
 if __name__ == '__main__':
