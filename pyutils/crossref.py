@@ -1,21 +1,45 @@
 #!/usr/bin/env python3
 """
+this script takes document object identifiers (dois) and
+outputs bibtex references with urls to web of science
+and the original article
+
+example:
 
 crossref.py 10.1021/jp047349j
 
+produces:
+
+@ARTICLE{Nrskov04,
+author = {Nørskov, J. K. and Rossmeisl, J. and Logadottir, A. and Lindqvist, L. and Kitchin, J. R. and Bligaard, T. and Jónsson, H.},"
+title = {Origin of the Overpotential for Oxygen Reduction at a Fuel-Cell Cathode},"
+journal = {J. Phys. Chem. B},"
+volume = {108},
+issue = {46},
+year = {04},
+pages = {17886-17892},
+doi = {10.1021/jp047349j},
+resource = {http://ezproxy.library.ubc.ca/login?url=http://pubs.acs.org/doi/abs/10.1021/jp047349j},
+wos = {http://bit.ly/1DKZ6Yc},
+citing = {http://bit.ly/1DKZ6r6},
+related = {http://bit.ly/1DKZ6ra},
+}
+
+
+"""
 ## In [7]: print sys.stdout.encoding
 ## ------> print(sys.stdout.encoding)
 ## UTF-8
 
-
+#
+# wos strings from
 #http://kitchingroup.cheme.cmu.edu/blog/2014/11/04/Accessing-web-of-science-entry-citing-and-related-articles-from-a-doi-in-emacs/
+#
+# crossref doi code
 #originally from http://www.thamnos.de/misc/look-up-bibliographical-information-from-a-doi/
 #need to submit your email address to  http://www.crossref.org/requestaccount/  which
 # then becomes your api key for requests via http://help.crossref.org/using_http
 #
-
-# http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info:doi/10.1021/jp047349j
-"""
 
 from __future__ import print_function
 import os,site
@@ -45,7 +69,7 @@ import sys
 linebreaks=argparse.RawTextHelpFormatter
 descrip=dedent(globals()['__doc__'])
 parser = argparse.ArgumentParser(formatter_class=linebreaks,description=descrip)
-parser.add_argument('dois',nargs='+',type=str,help='one or more dois')
+parser.add_argument('dois',nargs='+',type=str,help='one or more document object identifiers')
 args=parser.parse_args()
 
 
