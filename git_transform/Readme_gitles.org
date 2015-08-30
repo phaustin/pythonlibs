@@ -19,3 +19,8 @@ commit
 python confirm_trans.py /tera/phil/austinp/repos/SAM6.9.6 /tera/phil/austinp/repos/SAM6.8.2
 
 should show they are now identical
+
+
+<2015-06-19 Fri>
+
+get this working for 

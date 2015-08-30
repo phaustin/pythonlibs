@@ -1,10 +1,9 @@
-from __future__ import with_statement
 from hashlib import md5
 
 def md5sum(filename, buf_size=8192):
     m = md5()
     # the with statement makes sure the file will be closed 
-    with open(filename) as f:
+    with open(filename,'rb') as f:
         # We read the file in small chunk until EOF
         data = f.read(buf_size)
         while data:
@@ -16,4 +15,4 @@ def md5sum(filename, buf_size=8192):
 
 if __name__ == '__main__':
     import sys
-    print md5sum(sys.argv[1])
+    print(md5sum(sys.argv[1]))
