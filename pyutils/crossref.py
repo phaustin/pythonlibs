@@ -81,12 +81,14 @@ if __name__ == "__main__":
 
         # doiquote=urllib.parse.quote(doi)
         doiquote = doi
-        wos_url = r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info:doi/{doi:s}".format(
-            doi=doiquote)
-        citing_url = r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&svc.citing=yes".format(
-            doi=doiquote)
-        related_url = r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&svc.related=yes'.format(
-            doi=doiquote)
+        wos_url = (r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id'
+                   r'=info:doi/{doi:s}').format(doi=doiquote)
+        citing_url = (r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id='
+                      r'info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&'
+                      r'svc.citing=yes').format(doi=doiquote)
+        related_url = (r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&'
+                       r'rft_id=info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&'
+                       r'svc.related=yes').format(doi=doiquote)
 
         wos_url = bitly_conn.shorten(wos_url)['url']
         citing_url = bitly_conn.shorten(citing_url)['url']
@@ -202,8 +204,7 @@ if __name__ == "__main__":
         authorlist = " and ".join(authorlist)
         line_dict = dict(ascii_author=ascii_author, authorlist=authorlist,
                          text_title=text_title, abbrev_journal_title=abbrev_journal_title,
-                         volume=text_volume, issue=text_issue, year=text_year, year2d=text_year[
-                             -2:],
+                         volume=text_volume, issue=text_issue, year=text_year, year2d=text_year[-2:],
                          text_first_page=text_first_page, text_last_page=text_last_page, doi=doi, resource=resource,
                          wos_url=wos_url, citing_url=citing_url, related_url=related_url)
         text = """
