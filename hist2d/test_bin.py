@@ -2,8 +2,13 @@ from matplotlib import pyplot as plt
 plt.switch_backend('Agg') #batch
 #plt.switch_backend('MacOSX') #interactive
 import numpy as np
-from fastbin import do_bins,hist_2d
+import os,site
+home_dir=os.getenv('HOME')
+site.addsitedir('%s/repos' % home_dir)
+from pythonlibs.hist2d.fastbin import do_bins,hist_2d
 import numpy.random as nr
+
+
 
 from matplotlib import cm
 from matplotlib.colors import Normalize

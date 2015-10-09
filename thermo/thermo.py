@@ -1,7 +1,7 @@
 """This is the docstring for the esat.py module."""
 
 import numpy as np
-import matplotlib.cbook as cbook
+import collections 
 
 
 def esat(T):
@@ -36,7 +36,7 @@ def esat(T):
     """
     # determine if T has been input as a vector
     is_scalar=True
-    if cbook.iterable(T):
+    if isinstance(T,collections.Iterable):
         is_scalar = False
     T=np.atleast_1d(T)
     Tc = T - 273.15
@@ -49,7 +49,8 @@ def esat(T):
 def qsat(temp,press):
     #press in Pa, temp in K
     es=esat(temp)
-    qs=0.622*es/(press - es)
+    diff=press-es
+    qs=0.622*es/diff
     return qs
 
     

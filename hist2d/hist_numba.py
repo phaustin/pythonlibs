@@ -4,11 +4,11 @@ import numpy as np
 # nopython=True means an error will be raised
 # if fast compilation is not possible.
 @numba.jit(nopython=True)
-def fill_counts(y_centers,x_centers,y_indices,x_indices,hist_array):
-    num_xbins=x_centers.shape[0]
-    num_ybins=y_centers.shape[0]
+def fill_counts(y_centers,x_centers,y_indices,x_indices):
+    num_xbins=int(x_centers.shape[0])
+    num_ybins=int(y_centers.shape[0])
     num_y=y_indices.shape[0]
-    num_x=x_indices.shape[0]
+    hist_array=np.zeros((num_ybins,num_xbins),dtype=np.float32)
     for n in range(num_y): #y_indices and x_indices both size of raw data
         if x_indices[n] > 0 and y_indices[n] > 0 and \
             x_indices[n] <= num_xbins and y_indices[n] <= num_ybins:
@@ -27,11 +27,8 @@ def numba_hist2d(x_raw,y_raw,x_edges,y_edges):
     print('in numba')
     x_centers=(x_edges[:-1] + x_edges[1:])/2.
     y_centers=(y_edges[:-1] + y_edges[1:])/2.
-    num_xbins=int(len(x_centers))
-    num_ybins=int(len(y_centers))
     x_indices=np.asarray(np.searchsorted(x_edges, x_raw.flat, 'right'),dtype=np.int64)
     y_indices=np.asarray(np.searchsorted(y_edges, y_raw.flat, 'right'),dtype=np.int64)
-    hist_array=np.zeros([num_ybins, num_xbins], dtype=np.float)
-    hist_array=fill_counts(y_centers,x_centers,y_indices,x_indices,hist_array)
+    hist_array=fill_counts(y_centers,x_centers,y_indices,x_indices)
     return hist_array,x_centers,y_centers
 
