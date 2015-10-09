@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 this script takes document object identifiers (dois) and
 outputs bibtex references with urls to web of science
@@ -45,7 +45,7 @@ from textwrap import dedent
 import argparse
 import urllib
 
-from pythonlibs.pyutils.bitly_helper import get_connection
+from pyutils.bitly_helper import get_connection
 
 #
 # assumes utf-8 so ascii characters between 0-127

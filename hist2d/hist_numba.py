@@ -24,6 +24,7 @@ def fill_counts(y_centers,x_centers,y_indices,x_indices,hist_array):
 
             
 def numba_hist2d(x_raw,y_raw,x_edges,y_edges):
+    print('in numba')
     x_centers=(x_edges[:-1] + x_edges[1:])/2.
     y_centers=(y_edges[:-1] + y_edges[1:])/2.
     num_xbins=int(len(x_centers))
