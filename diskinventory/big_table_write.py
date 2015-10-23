@@ -26,7 +26,7 @@ def get_frame_from_query(the_query,colnames):
     df=DataFrame.from_records(list(the_query),columns=colnames)
     return df
 
-file_db='/tera/phil/diskinventory/files_newtera.db'
+file_db='./files_newtera.db'
 dbstring='sqlite:///{:s}'.format(file_db)
 db = dataset.connect(dbstring)
 session=sessionmaker(bind=db.engine)
