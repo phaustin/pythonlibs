@@ -34,16 +34,16 @@ class keep_df:
     def __init__(self,df_files):
         self.df_files=df_files
         self.owners=self.find_owners()
-        hit_owner={}
-        owner_sizes={}
-        for the_owner in the_data.find_owners():
-            hit,the_size=the_data.find_size(the_owner)
-            hit_owner[the_owner]=hit
-            owner_sizes[the_owner]=the_size
-        self.hit_owner=hit_owner
-        self.owner_sizes=owner_sizes
+        self.hit_owner={}
+        self.owner_sizes={}
         self.dirtree=collections.defaultdict(list)
         self.breakupdir=collections.defaultdict(list)
+
+    def set_sizes(self):
+        for the_owner in self.find_owners():
+            hit,the_size=self.find_size(the_owner)
+            self.hit_owner[the_owner]=hit
+            self.owner_sizes[the_owner]=the_size
 
     def find_owners(self):
         owners=set(self.df_files['owner'])
@@ -54,11 +54,17 @@ class keep_df:
         sizes=(self.df_files['size'][hit]).sum()
         return(hit,sizes)
 
-    def make_tree(self,owner):
-        hit=self.hit_owner[owner]
-        the_dirs=self.df_files[hit]['directory']
-        for a_dir in the_dirs:
-            self.dirtree[owner].append(a_dir.split('/'))
+    def make_tree(self,owner=None):
+        if owner:
+            hit=self.hit_owner[owner]
+            the_dirs=self.df_files[hit]['directory']
+            print('in make_tree ',len(the_dirs))
+            for a_dir in the_dirs:
+                self.dirtree[owner].append(a_dir.split('/'))
+        else:
+            the_dirs=self.df_files['directory']
+            for a_dir in the_dirs:
+                self.dirtree['all'].append(a_dir.split('/'))
 
     def write_breakup(self,owner,depth):
         for fragments in self.dirtree[owner]:
@@ -83,50 +89,51 @@ if __name__ == "__main__":
         large_query=thesession.query(file_table).filter(file_table.c.size > size).with_labels()
         colnames=[item.name for item in list(db.metadata.tables['files'].columns)]
         df_files=get_frame_from_query(large_query,colnames)
+        the_data = keep_df(df_files)
+        the_data.set_sizes()
     else:
         pass
+    
 
-    # if first_trip:
-    #     with pd.HDFStore('tera_recover.h5','w') as store:
-    #         store.put('all',df_files,format='table')
-    #         store.put('g100K',df_files_100K,format='table')
-    # owners=find_owner(df_files)
-    the_data = keep_df(df_files)
-    the_data.make_tree('vpopa')
-    the_data.write_breakup('vpopa',7)    
-    all_dirs=set(the_data.breakupdir['vpopa'])
-    df_vpopa=df_files[the_data.hit_owner['vpopa']].copy()
-    df_vpopa['breakupdir']=the_data.breakupdir['vpopa']
-    vpopa_groups=df_vpopa.groupby(['breakupdir'])
-    vpopa_size=vpopa_groups['size']
-    vpopa_name=vpopa_groups['name']
-    out=vpopa_size.agg(np.sum)
-    width=80
-    formatstring='{{0:<{}}} {{1:8.3f}}'.format(width)
-    print(formatstring,'\n')
-    sum=0
-    for key,value in out.items():
-        name=key.ljust(width)
-        if value < 1.e9:
-            continue
-        sum+=value
-        print(formatstring.format(key,value*1.e-9))
-        
-    # the_data.make_tree('nchaparr')
-    # the_data.write_breakup('nchaparr',8)    
-    # all_dirs=set(the_data.breakupdir['nchaparr'])
-    # df_nchaparr=df_files[the_data.hit_owner['nchaparr']].copy()
-    # df_nchaparr['breakupdir']=the_data.breakupdir['nchaparr']
-    # nchaparr_groups=df_nchaparr.groupby(['breakupdir'])
-    # nchaparr_size=nchaparr_groups['size']
-    # out=nchaparr_size.agg(np.sum)
-    # width=80
-    # formatstring='{{0:<{}}} {{1:8.3f}}'.format(width)
-    # print(formatstring,'\n')
-    # sum=0
-    # for key,value in out.items():
-    #     name=key.ljust(width)
-    #     if value < 1.e9:
-    #         continue
-    #     sum+=value
-    #     print(formatstring.format(key,value*1.e-9))
+    vpopa=False
+    if vpopa:
+        the_data.make_tree('vpopa')
+        the_data.write_breakup('vpopa',7)    
+        all_dirs=set(the_data.breakupdir['vpopa'])
+        df_vpopa=df_files[the_data.hit_owner['vpopa']].copy()
+        df_vpopa['breakupdir']=the_data.breakupdir['vpopa']
+        vpopa_groups=df_vpopa.groupby(['breakupdir'])
+        vpopa_size=vpopa_groups['size']
+        vpopa_name=vpopa_groups['name']
+        out=vpopa_size.agg(np.sum)
+        width=80
+        formatstring='{{0:<{}}} {{1:8.3f}}'.format(width)
+        print(formatstring,'\n')
+        sum=0
+        for key,value in out.items():
+            name=key.ljust(width)
+            if value < 1.e9:
+                continue
+            sum+=value
+            print(formatstring.format(key,value*1.e-9))
+
+    nchaparr=False
+    if nchaparr:
+        the_data.make_tree('nchaparr')
+        the_data.write_breakup('nchaparr',8)    
+        all_dirs=set(the_data.breakupdir['nchaparr'])
+        df_nchaparr=df_files[the_data.hit_owner['nchaparr']].copy()
+        df_nchaparr['breakupdir']=the_data.breakupdir['nchaparr']
+        nchaparr_groups=df_nchaparr.groupby(['breakupdir'])
+        nchaparr_size=nchaparr_groups['size']
+        out=nchaparr_size.agg(np.sum)
+        width=80
+        formatstring='{{0:<{}}} {{1:8.3f}}'.format(width)
+        print(formatstring,'\n')
+        sum=0
+        for key,value in out.items():
+            name=key.ljust(width)
+            if value < 1.e9:
+                continue
+            sum+=value
+            print(formatstring.format(key,value*1.e-9))
