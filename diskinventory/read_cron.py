@@ -39,16 +39,18 @@ from pythonlibs.diskinventory.parse_files import read_du,read_ls
 linebreaks=argparse.RawTextHelpFormatter
 descrip=textwrap.dedent(globals()['__doc__'])
 parser = argparse.ArgumentParser(formatter_class=linebreaks,description=descrip)
+parser.add_argument('--root_dir','-r',nargs='?', type=str,default='/backupspace/stats_newroc',
+                       help='path to du_root.txt ant ls_root.txt')
 parser.add_argument('root',  type=str,help='name of root directory (tera, newtera or users')
 parser.add_argument('outdir',type=str,help='output directory')
 args=parser.parse_args()
 
-namedict=dict(outdir=args.outdir,root=args.root)
+namedict=dict(outdir=args.outdir,root=args.root,base_dir=args.root_dir)
 
 dbname="{outdir:s}/files_{root:s}.db".format(**namedict)
 dbstring='sqlite:///{:s}'.format(dbname)
-du_outfile="/backupspace/stats_newroc/du_{root:s}.txt".format(**namedict)
-ls_outfile="/backupspace/stats_newroc/ls_{root:s}.txt".format(**namedict)
+du_outfile="{base_dir:s}/du_{root:s}.txt".format(**namedict)
+ls_outfile="{base_dir:s}/ls_{root:s}.txt".format(**namedict)
 silent_remove(dbname)
 db = dataset.connect(dbstring)
 print("created %s" % dbname)
