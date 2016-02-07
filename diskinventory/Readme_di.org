@@ -1,5 +1,9 @@
-Disk inventory code
-___________________
+#+STARTUP: showall
+#+STARTUP: hidestars
+
+
+* Disk inventory code
+
 
 /etc/cron.daily/backup  on roc
 /etc/cron.daily/rdiff_backups.sh on kite
@@ -20,3 +24,10 @@ files:     columnNames=['permission','links','owner','theGroup','size','date','d
 
 python3 retrieve.py /tera/phil/diskinventory/files_tera.db phil
 
+
+* TODO make di work with directory compare
+
+** compare tera and pip as a test
+   :PROPERTIES:
+   :ELDORO_POMODORI: 1
+   :END:
