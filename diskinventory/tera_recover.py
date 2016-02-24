@@ -60,12 +60,15 @@ class keep_df:
 
     def make_tree(self,owner=None):
         if owner:
-            hit=self.hit_owner[owner]
-            the_dirs=self.df_files[hit]['directory']
-            print('in make_tree ',len(the_dirs))
-            self.dirtree[owner]=[]
-            for a_dir in the_dirs:
-                self.dirtree[owner].append(a_dir.split('/'))
+            try:
+                hit=self.hit_owner[owner]
+                the_dirs=self.df_files[hit]['directory']
+                print('in make_tree ',len(the_dirs))
+                self.dirtree[owner]=[]
+                for a_dir in the_dirs:
+                    self.dirtree[owner].append(a_dir.split('/'))
+            except KeyError:
+                print("owner: {} not found".format('owner'))
         else:
             self.dirtree['all']=[]
             the_dirs=self.df_files['directory']
@@ -78,8 +81,11 @@ class keep_df:
             self.breakupdir[owner].append('/'.join(fragments[:depth]))
         
 if __name__ == "__main__":
+
+    first_trip=False
     if first_trip:
-        file_db='./files_newtera.db'
+        #file_db='./files_newtera.db'
+        file_db='./files_tera.db'
         dbstring='sqlite:///{:s}'.format(file_db)
         db = dataset.connect(dbstring)
         session=sessionmaker(bind=db.engine)
@@ -108,17 +114,19 @@ if __name__ == "__main__":
         the_data.make_tree('phil')
     else:
         pass
-    the_data.write_breakup('all',4)    
-    the_data.write_breakup('nchaparr',6)    
-    the_data.make_tree('xwei')
-    the_data.write_breakup('xwei',8)    
-    the_data.write_breakup('phil',5)    
+    the_data = keep_df(df_files)
+    the_data_100 = keep_df(df_files_100K)
+    the_data_100.write_breakup('all',4)    
+    #the_data.write_breakup('nchaparr',6)    
+    #the_data.make_tree('xwei')
+    #the_data.write_breakup('xwei',8)    
+    #the_data.write_breakup('phil',5)    
     
 
     vpopa=False
     if vpopa:
         all_dirs=set(the_data.breakupdir['vpopa'])
-        df_vpopa=df_files[the_data.hit_owner['vpopa']].copy()
+        df_vpopa=df_files_100K[the_data.hit_owner['vpopa']].copy()
         df_vpopa['breakupdir']=the_data.breakupdir['vpopa']
         vpopa_groups=df_vpopa.groupby(['breakupdir'])
         vpopa_size=vpopa_groups['size']
@@ -135,10 +143,10 @@ if __name__ == "__main__":
             sum+=value
             print(formatstring.format(key,value*1.e-9))
 
-    nchaparr=True
+    nchaparr=False
     if nchaparr:
         all_dirs=set(the_data.breakupdir['nchaparr'])
-        df_nchaparr=df_files[the_data.hit_owner['nchaparr']].copy()
+        df_nchaparr=df_files_100K[the_data.hit_owner['nchaparr']].copy()
         df_nchaparr['breakupdir']=the_data.breakupdir['nchaparr']
         nchaparr_groups=df_nchaparr.groupby(['breakupdir'])
         nchaparr_size=nchaparr_groups['size']
@@ -156,15 +164,14 @@ if __name__ == "__main__":
 
     all=True
     if all:
-        all_dirs=set(the_data.breakupdir['all'])
-        df_all=df_files[the_data.hit_owner['all']].copy()
-        df_all['breakupdir']=the_data.breakupdir['all']
+        all_dirs=set(the_data_100.breakupdir['all'])
+        df_all=df_files_100K[the_data.hit_owner['all']].copy()
+        df_all['breakupdir']=the_data_100.breakupdir['all']
         all_groups=df_all.groupby(['breakupdir'])
         all_size=all_groups['size']
         out=all_size.agg(np.sum)
         width=80
-        formatstring='{{0:<{}}} {{1:8.3f}}'.format(width)
-        print(formatstring,'\n')
+        formatstring='dump: {{0:<{}}} {{1:8.3f}}'.format(width)
         sum=0
         for key,value in out.items():
             name=key.ljust(width)
@@ -172,12 +179,13 @@ if __name__ == "__main__":
                 continue
             sum+=value
             print(formatstring.format(key,value*1.e-9))
+        print('total terabytes: {:8.3f}'.format(sum*1.e-9))
 
 
-    phil=True
+    phil=False
     if phil:
         all_dirs=set(the_data.breakupdir['phil'])
-        df_phil=df_files[the_data.hit_owner['phil']].copy()
+        df_phil=df_files_100K[the_data.hit_owner['phil']].copy()
         df_phil['breakupdir']=the_data.breakupdir['phil']
         phil_groups=df_phil.groupby(['breakupdir'])
         phil_size=phil_groups['size']
@@ -194,10 +202,10 @@ if __name__ == "__main__":
             print(formatstring.format(key,value*1.e-9))
 
     print('xwei')        
-    xwei=True
+    xwei=False
     if xwei:
         all_dirs=set(the_data.breakupdir['xwei'])
-        df_xwei=df_files[the_data.hit_owner['xwei']].copy()
+        df_xwei=df_files_100K[the_data.hit_owner['xwei']].copy()
         df_xwei['breakupdir']=the_data.breakupdir['xwei']
         xwei_groups=df_xwei.groupby(['breakupdir'])
         xwei_size=xwei_groups['size']

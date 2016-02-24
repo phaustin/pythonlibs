@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 ./read_cron.py tera .
 
@@ -24,8 +24,6 @@ will read the files ls_short.txt and du_sort.txt and
 write the database file_short.db
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
 
 import argparse, textwrap
 
@@ -50,6 +48,7 @@ dbname="{outdir:s}/files_{root:s}.db".format(**namedict)
 dbstring='sqlite:///{:s}'.format(dbname)
 du_outfile="{base_dir:s}/du_{root:s}.txt".format(**namedict)
 ls_outfile="{base_dir:s}/ls_{root:s}.txt".format(**namedict)
+print('reading the following files into db: ',du_outfile,ls_outfile)
 silent_remove(dbname)
 db = dataset.connect(dbstring)
 print("created {}".format(dbname))
