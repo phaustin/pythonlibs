@@ -43,9 +43,9 @@ related = {http://bit.ly/1DKZ6ra},
 
 from textwrap import dedent
 import argparse
-import urllib
+from urllib import request
 
-from pyutils.bitly_helper import get_connection
+#from pyutils.bitly_helper import get_connection
 
 #
 # assumes utf-8 so ascii characters between 0-127
@@ -58,7 +58,7 @@ def ascii_filt(my_string):
 
 if __name__ == "__main__":
 
-    bitly_conn = get_connection()
+    #bitly_conn = get_connection()
 
     debug = False
 
@@ -90,9 +90,9 @@ if __name__ == "__main__":
                        r'rft_id=info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&'
                        r'svc.related=yes').format(doi=doiquote)
 
-        wos_url = bitly_conn.shorten(wos_url)['url']
-        citing_url = bitly_conn.shorten(citing_url)['url']
-        related_url = bitly_conn.shorten(related_url)['url']
+        # wos_url = bitly_conn.shorten(wos_url)['url']
+        # citing_url = bitly_conn.shorten(citing_url)['url']
+        # related_url = bitly_conn.shorten(related_url)['url']
 
         # clear from previous
         text_journal_title = ""
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         line_dict = dict(doi=doi, crossref_api_key=crossref_api_key)
         text = 'http://www.crossref.org/openurl/?id=doi:{doi}&noredirect=true&pid={crossref_api_key}&format=unixref'
         text = text.format(**line_dict)
-        usock = urllib.request.urlopen(text)
+        usock = request.urlopen(text)
         xmldoc = minidom.parse(usock)
         usock.close()
 

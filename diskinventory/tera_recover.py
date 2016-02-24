@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
    ipython console:  run with %run -i
 

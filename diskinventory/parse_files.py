@@ -132,6 +132,7 @@ def read_du(dufile,the_table):
             size,direc=newline.split('\t',1)
             size=int(size)
             level=direc.count('/')
+            print('here is the level')
             out=(size,level,direc)
             collect.append(dict(list(zip(columnNames,out))))
             counter+=1
