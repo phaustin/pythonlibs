@@ -1,0 +1,95 @@
+#+TODO: TODO NEXT WAITING | DONE CANCELED
+#+TAGS: PROJECT(p)  READING(r) 
+#+TYP_TODO: TODO MAYBE WAITING NEXT DONE
+#+STARTUP: showall
+#+STARTUP: hidestars
+
+
+
+* project design
+
+  use scandir with [[file:~/repos/pythonlibs/pyutils/check_md5.py]]
+  to calculate keys
+
+  put fixed information in dataframe, path information in database
+
+<2015-06-19 Fri>
+
+* notes under repository control
+
+
+
+* Disk inventory code
+
+
+/etc/cron.daily/backup  on roc
+/etc/cron.daily/rdiff_backups.sh on kite
+
+1) Running ls and du to get file information
+
+  ./read_cron.py tera /tera/phil/diskinventory/
+
+  will produce read du_tera* and ls_tera* from 
+  /backupspace/stats_newroc and produce 
+
+  /tera/phil/diskinventory/files_tera_phil.db
+
+contains two tables
+direcs:    columnNames=['size','level','directory']
+files:     columnNames=['permission','links','owner','theGroup','size','date','directory','name','hash']
+
+
+python3 retrieve.py /tera/phil/diskinventory/files_tera.db phil
+
+
+* TODO make di work with directory compare
+
+** compare tera and pip as a test
+   :PROPERTIES:
+   :ELDORO_POMODORI: 7
+   :END:
+
+* workflow for recover code
+
+0) Run the following cron job on roc:
+
+/etc/cron.daily phil@newroc% cat rdiff_backups.sh
+#!/bin/bash
+
+#du -k /tera  > /backups/du_tera.txt
+#du -k /tera2  > /backups/du_tera2.txt
+du -k /users  > /backupspace/stats_newroc/roc_users.txt
+ls -R -l -Q --time-style=full-iso --time=status /tera/ > /backupspace/stats_newroc/ls_tera.txt
+du -k /tera/  > /backupspace/stats_newroc/du_tera.txt
+ls -R -l -Q --time-style=full-iso --time=status /newtera/ > /backupspace/stats_newroc/ls_newtera.txt
+du -k /newtera/  > /backupspace/stats_newroc/du_newtera.txt
+ls -R -l -Q --time-style=full-iso --time=status /users/ > /backupspace/stats_newroc/ls_users.txt
+du -k /users/  > /backupspace/stats_newroc/du_users.txt
+
+
+on osx use:  gls and gdu from brew coreutils
+
+
+1) use read_cron.py to read the files  [[file:read_cron.py::./read_cron.py%20tera%20.][read_cron.py]]
+
+python read_cron.py -r . di .
+
+
+2) write a pandas dataframe out with
+
+python big_table_write.py files_di.db files_di.h5
+
+[[file:big_table_write.py::big_table_write][big_table_write.py]]
+
+3) working example in [[file:small_test.sh::#%20small_test.sh][small_test.sh]]
+
+4) recovery example in [[file:tera_recover.py::ipython%20console:%20run%20with%20%25run%20-i][tera_recover.py]]
+
+
+* work on du as rough indentifier
+
+** on pip do du -k 
+
+
+  
+  
