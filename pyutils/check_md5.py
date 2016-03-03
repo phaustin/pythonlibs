@@ -11,7 +11,7 @@ def find_md5(the_map,seek_point,buf_length):
     m.update(data)
     return m.hexdigest()
 
-def check_md5(filename,buf_length):
+def check_md5(filename,buf_length=1.e5):
     try:
         with open(filename,"rb") as infile:
             with closing(mmap.mmap(infile.fileno(),0,access=mmap.ACCESS_READ)) as the_map:
@@ -22,14 +22,13 @@ def check_md5(filename,buf_length):
                     end_seek=file_size - buf_length
                 else:
                     start_seek=0
-                    mid_seek=0
-                    end_seek=0
                 start_hex=find_md5(the_map,start_seek,buf_length)
-                mid_hex=find_md5(the_map,mid_seek,buf_length)
-                end_hex=find_md5(the_map,end_seek,buf_length)
+                mid_hex='NA'
+                end_hex='NA'
     except:
         file_size,start_hex,mid_hex,end_hex=(-1,'bad','bad','bad')
-    return (file_size,start_hex,mid_hex,end_hex)
+    the_hash=';'.join((start_hex,mid_hex,end_hex))
+    return the_hash
 
 if __name__ == '__main__':
     the_file="/backupspace/newroc_users/nchaparr/nchaparr_owl/thesis/LESRun/Nov302013/data/runs/sam_case6/OUT_3D/NCHAPP1_testing_doscamiopdata_24_0000000780.bin3D"

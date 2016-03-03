@@ -6,9 +6,9 @@ or newtera or short or users
 
 read the ls and du output files ls_tera.txt and du_tera.txt
 
-write an sqllite databas called
+write an hdfstore file called
 
-file_tera.db
+file_tera.h5
 
 with tables 'direcs' and 'files'
 
@@ -44,17 +44,16 @@ args=parser.parse_args()
 
 namedict=dict(outdir=args.outdir,root=args.root,base_dir=args.root_dir)
 
-dbname="{outdir:s}/files_{root:s}.db".format(**namedict)
-dbstring='sqlite:///{:s}'.format(dbname)
+storename="{outdir:s}/files_{root:s}.h5".format(**namedict)
 du_outfile="{base_dir:s}/du_{root:s}.txt".format(**namedict)
 ls_outfile="{base_dir:s}/ls_{root:s}.txt".format(**namedict)
 print('reading the following files into db: ',du_outfile,ls_outfile)
-silent_remove(dbname)
+silent_remove(storename)
 db = dataset.connect(dbstring)
-print("created {}".format(dbname))
+print("created {}".format(storename))
 
 table_name='direcs'
-the_table = db.create_table(table_name)
+the_table = db.make_frame(table_name)
 the_table=db[table_name]
 counter=read_du(du_outfile,the_table)
 print("total lines read from {du_outfile:s} = {counter:d}".format_map(locals()))

@@ -70,7 +70,8 @@ du -k /users/  > /backupspace/stats_newroc/du_users.txt
 on osx use:  gls and gdu from brew coreutils
 
 
-1) use read_cron.py to read the files  [[file:read_cron.py::./read_cron.py%20tera%20.][read_cron.py]]
+
+1) use read_cron.py to read the files  [[file:read_cron.py][read_cron.py]]
 
 python read_cron.py -r . di .
 
@@ -86,10 +87,21 @@ python big_table_write.py files_di.db files_di.h5
 4) recovery example in [[file:tera_recover.py::ipython%20console:%20run%20with%20%25run%20-i][tera_recover.py]]
 
 
+* start over using
+
 * work on du as rough indentifier
 
-** on pip do du -k 
+** on pip do du -k  write the file out to  [[file:/pip_raid/phil/tera/du_pip_raid.txt]]
 
+** now read that in using [[file:read_cron.py][read_cron.py]]
 
+** new code is in parse_files.py  
+
+   python -m diskinventory.parse_files du_pip_raid.txt ls_pip_raid.txt pip_raid
+
+* focus first on 
+
+  /tera/phil/nchaparr/python phil@newroc% du -k Plotting > du_plotting.txt
   
+  in newroc:/home/phil/dirtrial
   
