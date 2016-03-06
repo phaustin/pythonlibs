@@ -1,99 +1,102 @@
 #!/usr/bin/env python
 """
- do a ls and adu of a file tree and save the output, converting
- the output files into two sql databases
 
- python make_ls.py /tera/phil /home/phil/ls_tera_phil
-
-
-will make stdout and stderr files for two processes:
-
- stdout1 = /home/phil/ls_tera_phil.txt
- stderr1 = /home/phil/ls_tera_phil_err.txt
- stdout2 = /home/phil/du_tera_phil.txt
- stderr2 = /home/phil/du_tera_phil_err.txt
-
- and run the following system commands
  
  ls -R -l -Q --time-style=full-iso --time=status /tera/phil
  du -k /tera/phil
 
- if these are successful, then the two stdout files will
- be turned into sqllite databases called
+ if these are successful, then  an h5 file will be generated with two dataframes
 
- /home/phil/ls_tera_phil.db
- /home/hil/du_tera_phil.db
+tera.h5
  
 """
-
+import pandas as pd
+from diskinventory.parse_files import read_du,read_ls
 import argparse, textwrap
 import subprocess,shlex
-
-from readdu import read_du
-from readls import read_ls
-import os,site
-import dataset
-
-home_dir=os.getenv('HOME')
-site.addsitedir('%s/repos' % home_dir)
-from pythonlibs.pyutils.silent_remove import silent_remove
-
+from io import StringIO
+import h5py
 
 linebreaks=argparse.RawTextHelpFormatter
 descrip=textwrap.dedent(globals()['__doc__'])
 parser = argparse.ArgumentParser(formatter_class=linebreaks,description=descrip)
-parser.add_argument('root', nargs=1, type=str,help='top directory to list')
-parser.add_argument('outfile_base', nargs=1,type=str,help='output name base')
+parser.add_argument('dump_info', type=str,help='name of yaml file with file information ')
 args=parser.parse_args()
 
-root_dict=dict(root=args.root[0])
+import ruamel.yaml,sys
+from collections import OrderedDict
+try:
+    with open(args.dump_info,'r') as f:
+        input_dict = ruamel.yaml.load(f,ruamel.yaml.RoundTripLoader)
+except FileNotFoundError as e:
+    yaml_dict=OrderedDict()
+    yaml_dict['root'] = '/root/path/here'
+    yaml_dict['h5_out']= '/path/to/h5file/here.h5'
+    yaml_dict['buf_length']= 1.e-15
+    with open(e.filename,'w') as f:
+        ruamel.yaml.dump(yaml_dict,f,Dumper=ruamel.yaml.RoundTripDumper,default_flow_style=False)
+    print('created yaml template {}'.format(e.filename))
+    print('edit and rerun')
+    sys.exit(0)
+
+
 command_string="ls -R -l -Q --time-style=full-iso --time=status {root:s}"
 
-basename=args.outfile_base[0]
-errfile='ls_%s_err.txt' % basename
-ls_outfile='ls_%s.txt' % basename
+errfile='ls_{text_base:s}_err.txt'.format_map(input_dict)
+ls_outfile='ls_{text_base:s}.txt'.format_map(input_dict)
 
-command=command_string.format(**root_dict)
-print "executing: ",command
-print "stdout and stderr set to: ",ls_outfile,errfile
+command=command_string.format_map(input_dict)
+print("executing: ",command)
+print("stdout and stderr set to: ",ls_outfile,errfile)
 
 with open(ls_outfile,'w') as stdout:
     with open(errfile,'w') as stderr:
-              subprocess.check_call(shlex.split(command),stderr=stderr,stdout=stdout)
+        subprocess.check_call(shlex.split(command),stderr=stderr,stdout=stdout)
 
-
-errfile='du_%s_err.txt' % basename
-du_outfile='du_%s.txt' % basename
+du_errfile='du_{text_base:s}_err.txt'.format_map(input_dict)
+du_outfile='du_{text_base:s}.txt'.format_map(input_dict)
 
 command_string='du -k {root:s}'
-command=command_string.format(**root_dict)
+command=command_string.format_map(input_dict)
 
 with open(du_outfile,'w') as stdout:
-    with open(errfile,'w') as stderr:
-              subprocess.check_call(shlex.split(command),stderr=stderr,stdout=stdout)
+    with open(du_errfile,'w') as stderr:
+        subprocess.check_call(shlex.split(command),stderr=stderr,stdout=stdout)
 
-print "executing: ",command
-print "stdout and stderr set to: ",du_outfile,errfile
+print("executing: ",command)
+print("stdout and stderr set to: ",du_outfile,du_errfile)
 
-dbname="files_%s.db" % basename
-dbstring='sqlite:///{:s}'.format(dbname)
-silent_remove(dbname)
-db = dataset.connect(dbstring)
+truncate=False
+if truncate:
+    tempfile='tempout'
+    with open(ls_outfile,'r') as infile:
+        with open(tempfile,'w') as outfile:
+            for i in range(10000):
+                outfile.write(next(infile))
+    import shutil
+    shutil.move(tempfile,ls_outfile)
 
-table_name='direcs'
-the_table = db.create_table(table_name)
-the_table=db[table_name]
+du_frame=read_du(du_outfile)
 
-counter=read_du(du_outfile,the_table)
-print "total lines: read from %s=%d" % (du_outfile,counter)
-print "created %s" % dbname
+counter,ls_frames,err_list = read_ls(ls_outfile)
+print(counter,len(ls_frames))
 
-table_name='files'
-the_table = db.create_table(table_name)
-the_table=db[table_name]
+with pd.HDFStore(input_dict['h5_out'],'w') as store:
+    table_name = input_dict['table_du']
+    store.put(table_name,du_frame,format='table')
+    for index,the_frame in enumerate(ls_frames):
+        table_name='{}_{}'.format(input_dict['table_ls'],index)
+        store.put(table_name,the_frame,format='table')
+    
+#
+# now dump the yaml file to a string
+#
+yaml_string = ruamel.yaml.dump(input_dict,None,Dumper=ruamel.yaml.RoundTripDumper,
+                               default_flow_style=False)
 
-counter=read_ls(ls_outfile,the_table)
-print "total lines: read from %s=%d" % (ls_outfile,counter)
+with h5py.File(input_dict['h5_out'],'a') as f:
+    f.attrs['yaml_string']=yaml_string
+    f.attrs['yaml_file'] = args.dump_info
 
 
 

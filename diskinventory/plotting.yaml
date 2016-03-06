@@ -1,0 +1,20 @@
+!!omap
+#
+# root -- root name given to du and ls
+# h5_out:  name of the hdf5 output file
+# table_du and table_ls -- keys for h5 file
+#
+- root: /tera/phil/nchaparr/python/Plotting
+- h5_out: tera_plotting.h5
+- table_du: du
+- table_ls: ls
+#
+# buf_length:  length of bytestring for check_md5
+# text_base: name of output files for du and ls dumps
+# blocksize: number of lines in dataframe for ls files
+#
+- buf_length: 1.e5
+- text_base: plotting
+- blocksize: 1.e6
+
+

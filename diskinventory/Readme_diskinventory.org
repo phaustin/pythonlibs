@@ -105,3 +105,9 @@ python big_table_write.py files_di.db files_di.h5
   
   in newroc:/home/phil/dirtrial
   
+* delete indvidual files from list  using diskinvetory.parsefiles
+
+  - make_ls.py uses du and ls to create an h5 file with dataframes
+  - read_ls_h5.py reads the h5 file
+  - plotting.yaml contains the yaml config
+
