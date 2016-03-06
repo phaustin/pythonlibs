@@ -37,6 +37,13 @@ print(yaml_dict)
 
 with pd.HDFStore(args.dump_info,'r') as f:
     print('dataframes: ',f.keys())
+    df_ls=f['ls_0']
+
+print(df_ls.columns)    
+print(df_ls['name'].head())
+print(df_ls['directory'].head())
+
+
     
 
 

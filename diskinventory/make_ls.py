@@ -16,6 +16,7 @@ import argparse, textwrap
 import subprocess,shlex
 from io import StringIO
 import h5py
+import glob
 
 linebreaks=argparse.RawTextHelpFormatter
 descrip=textwrap.dedent(globals()['__doc__'])
@@ -39,6 +40,12 @@ except FileNotFoundError as e:
     print('edit and rerun')
     sys.exit(0)
 
+try:
+    check_root = glob.glob(input_dict['root'])[0]
+except IndexError:
+    raise ValueError("root {} doesn't exist".format(input_dict['root']))
+
+input_dict['root'] = check_root + '/'
 
 command_string="ls -R -l -Q --time-style=full-iso --time=status {root:s}"
 
@@ -68,17 +75,18 @@ print("stdout and stderr set to: ",du_outfile,du_errfile)
 
 truncate=False
 if truncate:
+    count=500
     tempfile='tempout'
     with open(ls_outfile,'r') as infile:
         with open(tempfile,'w') as outfile:
-            for i in range(10000):
+            for i in range(count):
                 outfile.write(next(infile))
     import shutil
     shutil.move(tempfile,ls_outfile)
 
-du_frame=read_du(du_outfile)
+du_frame=read_du(du_outfile,input_dict['root'])
 
-counter,ls_frames,err_list = read_ls(ls_outfile)
+counter,ls_frames,err_list = read_ls(ls_outfile,input_dict['root'])
 print(counter,len(ls_frames))
 
 with pd.HDFStore(input_dict['h5_out'],'w') as store:
@@ -97,6 +105,7 @@ yaml_string = ruamel.yaml.dump(input_dict,None,Dumper=ruamel.yaml.RoundTripDumpe
 with h5py.File(input_dict['h5_out'],'a') as f:
     f.attrs['yaml_string']=yaml_string
     f.attrs['yaml_file'] = args.dump_info
+    f.attrs['root'] = input_dict['root'][:-1]
 
 
 

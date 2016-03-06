@@ -25,7 +25,7 @@ import datetime as dt
 import pandas as pd
 from pyutils.check_md5 import check_md5
 
-def read_ls(listfile,blocksize=50000, buffer_length=1.e5):
+def read_ls(listfile,root_path,blocksize=50000, buffer_length=1.e5):
     """
        read lines from listfile and transfer to
        database dataframe
@@ -51,9 +51,10 @@ def read_ls(listfile,blocksize=50000, buffer_length=1.e5):
             newline=newline.strip()
             if len(newline)>0:
                 if newline[-1]==":":
+                    #found a directory name
                     #"/Users/phil/www.physics.mcgill.ca/~gang/ftp.transfer":
                     dirname=stripQuotes.match(newline)
-                    dirname=dirname.group(1)
+                    dirname_capture=dirname.group(1)
                     continue
                 else:
                     test=getName.match(newline)
@@ -67,22 +68,17 @@ def read_ls(listfile,blocksize=50000, buffer_length=1.e5):
                         #
                         # check for a path name like /home/phil/eosc211_fall2005.txt
                         #
-                        root,filename=os.path.split(test.group("name"))
-                        if len(root) > 0:
-                            dirname=root
-                        else:
-                            #
-                            # we've got a plain file name
-                            #
-                            filename=test.group("name")
+                        head_path,filename=os.path.split(test.group("name"))
+                        if len(head_path) != 0:
+                            raise ValueError("expecting a naked filename, got {}".format(test.group("name")))
                         try:
                             permission,links,owner,theGroup,size,date,time,offset =\
                                     blanks.split(test.group("left").strip())
                             #the_hash=hashlib.sha256('{}/{}'.format(dirname,filename).encode('utf-8')).hexdigest()
-                            the_hash=check_md5('{}/{}'.format(dirname,filename),buffer_length=buffer_length)
+                            the_hash=check_md5('{}/{}'.format(dirname_capture,filename),buffer_length=buffer_length)
                         except ValueError:
                             saveit=dict(newline=newline,splitout=repr(blanks.split(test.group("left").strip())),
-                                        dirname=dirname,filename=filename,counter=counter)
+                                        dirname=head_path,filename=filename,counter=counter)
                             errmsg=\
                                 """
                                   __________
@@ -100,7 +96,14 @@ def read_ls(listfile,blocksize=50000, buffer_length=1.e5):
                         date_utc = date_with_tz.astimezone(timezone('UTC'))
                         timestamp=int(date_utc.strftime('%s'))
                         #columnNames=['permission','links','owner','theGroup','size','date','directory','name','hash']
+                        if dirname_capture.find(root_path) < 0:
+                            raise ValueError('dirname root error for dirname= {} and rootpath= {}'.format(dirname_capture,root_path))
+                        if dirname_capture == root_path:
+                            dirname = '.'
+                        else:
+                            dirname = dirname_capture[len(root_path):]
                         out=(permission,links,owner,theGroup,size,timestamp,dirname,filename,the_hash)
+                        
                         collect.append(dict(list(zip(columnNames,out))))
                         ## print string_date
                         ## print date_utc
@@ -112,7 +115,7 @@ def read_ls(listfile,blocksize=50000, buffer_length=1.e5):
     return counter,frame_list,errlist
 
 
-def read_du(dufile):
+def read_du(dufile,root_path):
     """
        read lines from dufile and transfer to
        database table the_table
