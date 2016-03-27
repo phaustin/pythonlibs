@@ -120,7 +120,25 @@ python big_table_write.py files_di.db files_di.h5
 * <2016-03-20 Sun>  
   get [[file:read_ls_h5.py::*%20read_ls_h5.py][read_ls_h5.py]] going
   run with python -m diskinventory.read_ls_h5 *h5
+  reads the internal yaml file
 
 
 * get all bin3d files moved to pip
+  working in /newtera/tera/phil/diskinventory/
+  symbolic link to ln -s ~/repos/pythonlibs/diskinventory/vlad_newtera.yaml .
+    produces vlad_checkpoints_thin.h5
 
+  python -m diskinventory.find_bin3d *thin*h5
+
+  produces  filelist.txt 
+
+/newtera/tera/vpopa/sam_checkpoints/CGILS_S6_IDEAL_GREX/OUT_3D/CGILS_S6_IDEAL_295K_3D_96x96x121_100m_100m_40m_1s_48_0000000300.bin3D
+/newtera/tera/vpopa/sam_checkpoints/CGILS_S6_IDEAL_GREX/OUT_3D/CGILS_S6_IDEAL_295K_3D_96x96x121_100m_100m_40m_1s_48_0000000600.bin3D
+/newtera/tera/vpopa/sam_checkpoints/CGILS_S6_IDEAL_GREX/OUT_3D/CGILS_S6_IDEAL_295K_3D_96x96x121_100m_100m_40m_1s_48_0000000900.bin3D
+/
+
+
+
+/media/sea8a/data phil@pip% rsync -av --files-from=filelist.txt newroc:/ .
+
+check this filelist in as 
