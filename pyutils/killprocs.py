@@ -6,7 +6,6 @@ import sys
 def on_terminate(proc):
     print("process {} terminated with exit code {}".format(proc, proc.returncode))
 
-
 if __name__ == "__main__":
 
     keepit={}
