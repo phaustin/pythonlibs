@@ -87,9 +87,10 @@ def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_inter
                             permission,links,owner,theGroup,size,date,time,offset =\
                                     blanks.split(test.group("left").strip())
                             #the_hash=hashlib.sha256('{}/{}'.format(dirname,filename).encode('utf-8')).hexdigest()
-                            the_hash = check_md5('{}/{}'.format(
-                                dirname_capture, filename),
-                                                 buffer_length=buffer_length)
+                            # the_hash = check_md5('{}/{}'.format(
+                            #     dirname_capture, filename),
+                            #                      buffer_length=buffer_length)
+                            the_hash = 999.
                         except ValueError:
                             saveit = dict(newline=newline,
                                           splitout=repr(blanks.split(

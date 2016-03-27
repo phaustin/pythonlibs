@@ -4,7 +4,7 @@
 #+STARTUP: showall
 #+STARTUP: hidestars
 
-
+* Readme_diskinventory.org
 
 * project design
 
@@ -42,7 +42,8 @@ files:     columnNames=['permission','links','owner','theGroup','size','date','d
 python3 retrieve.py /tera/phil/diskinventory/files_tera.db phil
 
 
-* TODO make di work with directory compare
+* DONE make di work with directory compare
+  CLOSED: [2016-03-19 Sat 12:03]
 
 ** compare tera and pip as a test
    :PROPERTIES:
@@ -110,4 +111,16 @@ python big_table_write.py files_di.db files_di.h5
   - make_ls.py uses du and ls to create an h5 file with dataframes
   - read_ls_h5.py reads the h5 file
   - plotting.yaml contains the yaml config
+
+* <2016-03-19 Sat>  do a census of vlads files
+
+  working with [[file:/newtera/tera/phil/vlad_newtera.yaml::#%20vlad_newtera.yaml][vlad_newtera.yaml]]
+  add up all cloud tracking files
+  
+* <2016-03-20 Sun>  
+  get [[file:read_ls_h5.py::*%20read_ls_h5.py][read_ls_h5.py]] going
+  run with python -m diskinventory.read_ls_h5 *h5
+
+
+* get all bin3d files moved to pip
 

@@ -1,0 +1,24 @@
+!!omap
+#
+# root -- root name given to du and ls
+# h5_out:  name of the hdf5 output file
+# table_du and table_ls -- keys for h5 file
+#
+- root: /newtera/tera/vpopa/sam_checkpoints
+- h5_out: vlad_checkpoints.h5
+- table_du: du
+- table_ls: ls
+#
+# buf_length:  length of bytestring for check_md5
+# text_base: name of output files for du and ls dumps
+# blocksize: number of lines in dataframe for ls files
+#
+- buf_length: 1.e5
+- text_base: vlad_checkpoints
+- run_ls_du: True
+- blocksize: 1.e6
+- debug: True
+- debug_interval: 1000
+- do_truncate: False
+
+
