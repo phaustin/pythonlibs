@@ -13,7 +13,7 @@ def print_attrs(name, obj):
         print('member of group: ',obj.parent.name,obj)
     try:
         for key, val in obj.attrs.items():
-            print("attribute for {:s}    {:s}: {:s}".format(obj.name,key, val))
+            print("attribute for {}    {}: {}".format(obj.name,key, val))
     except IOError:
         print('this is an HDFStore pandas dataframe')
         print('-'*20)
