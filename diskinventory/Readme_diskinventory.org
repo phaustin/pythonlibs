@@ -141,4 +141,6 @@ python big_table_write.py files_di.db files_di.h5
 
 /media/sea8a/data phil@pip% rsync -av --files-from=filelist.txt newroc:/ .
 
-check this filelist in as 
+check this filelist in as  history/vpop_2016_2_27
+
+
