@@ -9,7 +9,7 @@
 """
 import psutil
 from pyutils.helper_funs import make_tuple
-import sys
+
 import argparse
 import textwrap
 
