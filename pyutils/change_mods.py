@@ -8,8 +8,9 @@ def scantree(path):
     for entry in scandir(path):
         if entry.is_dir(follow_symlinks=False):
             fullpath = Path(entry.path)
-            os.chmod(str(fullpath), stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | 
-                     stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+            os.chmod(
+                str(fullpath), stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH
+                | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
             yield from scantree(entry.path)  # see below for Python 2.x
         else:
             yield entry
@@ -21,4 +22,5 @@ if __name__ == '__main__':
     for entry in scantree(sys.argv[1] if len(sys.argv) > 1 else '.'):
         if entry.path.find('.git') == -1:
             fullpath = Path(entry.path)
+            #noop here -- chmod is done in scantree
 #            os.chmod(str(fullpath), stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
