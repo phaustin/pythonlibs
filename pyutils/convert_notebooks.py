@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
    convert all ipython notebooks to python scripts (first time)
-   convert all new or modified notebooks (subsequently)
+  convert all new or modified notebooks (subsequently)
 
    usage:
 
