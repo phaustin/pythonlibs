@@ -52,6 +52,10 @@ def check_md5(filename, buffer_length=1.e4):
 
 
 if __name__ == '__main__':
-    the_file = "/backupspace/newroc_users/nchaparr/nchaparr_owl/thesis/LESRun/Nov302013/data/runs/sam_case6/OUT_3D/NCHAPP1_testing_doscamiopdata_24_0000000780.bin3D"
+    import sys
+    if len(sys.argv) < 2:
+        the_file = "/backupspace/newroc_users/nchaparr/nchaparr_owl/thesis/LESRun/Nov302013/data/runs/sam_case6/OUT_3D/NCHAPP1_testing_doscamiopdata_24_0000000780.bin3D"
+    else:
+        the_file = sys.argv[1]
     buf_length = int(1.e5)
     print(check_md5(the_file, buf_length))

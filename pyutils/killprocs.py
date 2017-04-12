@@ -25,7 +25,7 @@ if __name__ == "__main__":
     descrip = textwrap.dedent(globals()['__doc__'])
     parser = argparse.ArgumentParser(formatter_class=linebreaks,
                                      description=descrip)
-    parser.add_argument('string', type=str, help='string in processname')
+    parser.add_argument('snip', type=str, help='string in processname')
     args = parser.parse_args()
 
     keepit = {}
@@ -38,14 +38,14 @@ if __name__ == "__main__":
         except (psutil.ZombieProcess, psutil.AccessDenied,
                 psutil.NoSuchProcess):
             pass
-
-    proclist = []
+    print('in killprocs.py, looking for {}'.format(args.snip))
     #
     # don't kill this process or the emacs python parser
     #
+    proclist = []
     for the_tup in keepit.values():
         string_cmd = ' '.join(the_tup.cmdline)
-        if the_tup.name.find(args.string) > -1 and \
+        if the_tup.name.find(args.snip) > -1 and \
            string_cmd.find('killprocs') == -1 and \
            string_cmd.find('elpy') == -1:
             proclist.append(the_tup)

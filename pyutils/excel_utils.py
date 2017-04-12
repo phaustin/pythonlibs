@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 import pandas as pd
 from collections import OrderedDict as od
-import numpy as np
+import numpy as np,pdb
 
 def cleanit(item):
         cleanitem = item.encode('ascii', 'ignore').decode('ascii')
@@ -9,7 +9,7 @@ def cleanit(item):
     
 
 def make_simple(the_file,numcols=None):
-    wb=load_workbook(the_file,data_only=True,use_iterators=True)
+    wb=load_workbook(the_file,data_only=True)
     combine,=wb.get_sheet_names()
     sheet=wb[combine]
     row_iter=sheet.iter_rows()
@@ -22,8 +22,8 @@ def make_simple(the_file,numcols=None):
     lines=[]
     for count,row in enumerate(row_iter):
         values=[item.value for item in row]
+        #print("values: ",values)
         values=values[:endcol]
-        #print('values are: ',values)
         clean_values = []
         for name, value in zip(clean_head,values):
             if (name == 'Username' or name == 'Student Number' or
@@ -33,9 +33,10 @@ def make_simple(the_file,numcols=None):
                 try:
                     clean_values.append(float(value))
                 except (ValueError,TypeError):
-                    clean_values.append(np.nan)
+                    clean_values.append(value)
         lines.append(clean_values)
     df_out=pd.DataFrame.from_records(lines,columns=clean_head)
+    #pdb.set_trace()
     # test=df_out.loc[:20]
     # for item in test:
     #     youritem = item.encode('ascii', 'ignore').decode('ascii')
@@ -45,7 +46,7 @@ def make_simple(the_file,numcols=None):
 
 
 def make_simple_headers(the_file,numcols=None):
-    wb=load_workbook(the_file,data_only=True,use_iterators=True)
+    wb=load_workbook(the_file,data_only=True,read_only=True)
     combine,=wb.get_sheet_names()
     sheet=wb[combine]
     row_iter=sheet.iter_rows()

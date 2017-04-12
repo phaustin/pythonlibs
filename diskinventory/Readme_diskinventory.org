@@ -146,3 +146,30 @@ check this filelist in as  history/vpop_2016_2_27
 
 
 
+* here is the cronjob
+
+/etc/cron.daily phil@newroc% cat backup
+#!/bin/bash
+
+#du -k /tera  > /backups/du_tera.txt
+#du -k /tera2  > /backups/du_tera2.txt
+du -k /users  > /backupspace/stats_newroc/roc_users.txt
+ls -R -l -Q --time-style=full-iso --time=status /tera/ > /backupspace/stats_newroc/ls_tera.txt
+du -k /tera/  > /backupspace/stats_newroc/du_tera.txt
+ls -R -l -Q --time-style=full-iso --time=status /newtera/ > /backupspace/stats_newroc/ls_newtera.txt
+du -k /newtera/  > /backupspace/stats_newroc/du_newtera.txt
+ls -R -l -Q --time-style=full-iso --time=status /users/ > /backupspace/stats_newroc/ls_users.txt
+du -k /users/  > /backupspace/stats_newroc/du_users.txt
+
+#du -k /backups/kite  > /backups/kite_users.txt
+
+#Backup script to perform rdiff-backups of select /users directories
+users=(ccorbel\ hbarker\ jcole\ jdawe\ mjerg\ mshephar\ nchaparr\ user-soft\ loh\ austinp\ ecsim\ vpopa\ csioris\ ftornow\ cpatrizi\ phil)
+
+for i in $users; do
+    /usr/bin/rdiff-backup --force -v 6 /home/$i /backupspace/newroc_users/$i # >& /backupspace/logs/$i/backup.log
+    #cat /backupspace/logs/$i/backup.log
+    #chmod ugo+r /backupspace/logs/$i/backup.log
+done
+
+ /usr/bin/rdiff-backup --force -v 6 /newtera/safe /backupspace/newtera/safe 
