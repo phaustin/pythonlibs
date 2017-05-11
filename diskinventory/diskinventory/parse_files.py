@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 #on osx
 #/usr/local/Cellar/coreutils/8.22/libexec/gnubin/ls
@@ -31,6 +31,12 @@ def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_inter
     """
        read lines from listfile and transfer to
        database dataframe
+
+
+    Parameters
+    ----------
+
+    listfile: ls filename
     """
     blocksize = int(blocksize)
     blanks = re.compile('\s+')
