@@ -173,3 +173,11 @@ for i in $users; do
 done
 
  /usr/bin/rdiff-backup --force -v 6 /newtera/safe /backupspace/newtera/safe 
+
+<2017-05-11 Thu>
+
+/repos/pythonlibs/diskinventory
+python diskinventory/parse_files.py stats_newroc/du_users.txt stats_newroc/ls_users.txt users
+
+in /Users/phil/repos/pythonlibs/diskinventory:
+rsync --progress --stats -az -e ssh newroch:/backupspace/stats_newroc/ stats_newroc/.

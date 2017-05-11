@@ -123,8 +123,7 @@ def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_inter
                         #columnNames=['permission','links','owner','theGroup','size','date','directory','name','hash']
                         if dirname_capture.find(root_path) < 0:
                             raise ValueError(
-                                'dirname root error for dirname= {} and rootpath= {}'.format(
-                                    dirname_capture, root_path))
+                                f'dirname root error for dirname= {dirname_capture} and rootpath= {root_path} with counter={counter}')
                         if dirname_capture == root_path:
                             dirname = '.'
                         else:
@@ -153,6 +152,7 @@ def read_du(dufile, root_path):
     with open(dufile, 'r', encoding='utf-8') as f:
         for newline in f:
             newline = newline.strip()
+            #print('debug: ',newline)
             size, direc = newline.split('\t', 1)
             size = int(size)
             level = direc.count('/')
@@ -188,5 +188,5 @@ if __name__ == "__main__":
     head, ext = os.path.splitext(listfile)
     print("reading file: ", listfile)
     h5_root = "ls_{}".format(args.store_root)
-    out = read_ls(listfile, h5_root)
+    out = read_ls(listfile, args.store_root)
     print(out)
