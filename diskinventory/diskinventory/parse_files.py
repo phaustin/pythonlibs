@@ -181,12 +181,11 @@ if __name__ == "__main__":
     head, ext = os.path.splitext(dufile)
     print("reading file: ", dufile)
     h5_root = "du_{}".format(args.store_root)
-    out = read_du(dufile, h5_root)
-    print(out)
+    out_du = read_du(dufile, h5_root)
 
     listfile = args.listname
     head, ext = os.path.splitext(listfile)
     print("reading file: ", listfile)
     h5_root = "ls_{}".format(args.store_root)
-    out = read_ls(listfile, args.store_root)
-    print(out)
+    out_ls = read_ls(listfile, args.store_root)
+    

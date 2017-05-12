@@ -181,3 +181,8 @@ python diskinventory/parse_files.py stats_newroc/du_users.txt stats_newroc/ls_us
 
 in /Users/phil/repos/pythonlibs/diskinventory:
 rsync --progress --stats -az -e ssh newroch:/backupspace/stats_newroc/ stats_newroc/.
+
+
+python -m diskinventory.parse_files stats_newroc/du_users.txt stats_newroc/ls_users.txt users
+
+run /home/phil/repos/pythonlibs/diskinventory/diskinventory/parse_files.py stats_newroc/du_users.txt stats_newroc/ls_users.txt users
