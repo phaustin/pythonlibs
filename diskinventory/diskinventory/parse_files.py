@@ -25,7 +25,23 @@ import datetime as dt
 import pandas as pd
 from pyutils.check_md5 import check_md5
 import logging
+import pyarrow as pa
+import pyarrow.parquet as pq
 
+
+import pandas as pd
+
+def write_all(du_frame,df_list,diskname):
+    table = pa.Table.from_pandas(du_frame)
+    filename=f'df_{diskname}_du.pq'
+    pq.write_table(table, filename,compression='snappy')
+    for counter,item in enumerate(df_list):
+        if len(item) > 0:
+            filename=f'df_{diskname}_ls_{counter:03d}.pq'
+            item.reset_index(drop=True,inplace=True)
+            print(f'writing file {counter}')
+            table = pa.Table.from_pandas(item)
+            pq.write_table(table, filename,compression='snappy')
 
 def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_interval=1000):
     """
@@ -163,7 +179,7 @@ def read_du(dufile, root_path):
     return new_frame
 
 
-if __name__ == "__main__":
+def main():
     import argparse, textwrap
     linebreaks = argparse.RawTextHelpFormatter
     descrip = textwrap.dedent(globals()['__doc__'])
@@ -181,11 +197,16 @@ if __name__ == "__main__":
     head, ext = os.path.splitext(dufile)
     print("reading file: ", dufile)
     h5_root = "du_{}".format(args.store_root)
-    out_du = read_du(dufile, h5_root)
+    df_du = read_du(dufile, h5_root)
 
     listfile = args.listname
     head, ext = os.path.splitext(listfile)
     print("reading file: ", listfile)
     h5_root = "ls_{}".format(args.store_root)
-    out_ls = read_ls(listfile, args.store_root)
+    counter, frame_list, errlist = read_ls(listfile, args.store_root)
+    write_all(df_du,frame_list,args.store_root)
+    print(f'here is errlist: {errlist}')
+    
+if __name__ == "__main__":
+    main()
     

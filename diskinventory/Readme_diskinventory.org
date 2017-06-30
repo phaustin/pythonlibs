@@ -186,3 +186,9 @@ rsync --progress --stats -az -e ssh newroch:/backupspace/stats_newroc/ stats_new
 python -m diskinventory.parse_files stats_newroc/du_users.txt stats_newroc/ls_users.txt users
 
 run /home/phil/repos/pythonlibs/diskinventory/diskinventory/parse_files.py stats_newroc/du_users.txt stats_newroc/ls_users.txt users
+
+python -m diskinventory.parse_files stats_newroc/du_users.txt stats_newroc/ls_users.txt users
+
+python -m diskinventory.parse_files stats_newroc/du_tera.txt stats_newroc/ls_tera.txt tera
+
+python -m diskinventory.parse_files stats_newroc/du_newtera.txt stats_newroc/ls_newtera.txt newtera
