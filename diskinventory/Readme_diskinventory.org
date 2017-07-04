@@ -192,3 +192,15 @@ python -m diskinventory.parse_files stats_newroc/du_users.txt stats_newroc/ls_us
 python -m diskinventory.parse_files stats_newroc/du_tera.txt stats_newroc/ls_tera.txt tera
 
 python -m diskinventory.parse_files stats_newroc/du_newtera.txt stats_newroc/ls_newtera.txt newtera
+
+<2017-07-02 Sun>
+
+parse_files.py produces a set of parque files
+
+read_parque.py concatenates them into a single dask dataframe and writes to out_newtera
+
+try to repartition with dask_process.py
+
+try again with dask_reprocess.py
+
+<2017-07-03 Mon>
