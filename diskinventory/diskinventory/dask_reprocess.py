@@ -25,8 +25,8 @@ if __name__ == "__main__":
     descrip = textwrap.dedent(globals()['__doc__'])
     parser = argparse.ArgumentParser(formatter_class=linebreaks,
                                      description=descrip)
-    parser.add_argument('nc_file', type=str, help='netcdf file name')
-    parser.add_argument('json_file', type=str, help='json output namee')
+    parser.add_argument('in_dir', type=str, help='directory with parquet dataset')
+    parser.add_argument('out_dir', type=str, help='directory for transformed dataset')
     args=parser.parse_args()
-    reprocess(args.nc_file,args.json_file)
+    reprocess(args.in_dir,args.out_dir)
     
