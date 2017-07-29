@@ -12,6 +12,10 @@ setup(
     classifiers=[
         'License :: OSI Approved :: BSD License'
     ],
+    entry_points={
+          'console_scripts': [
+              'get_space = pyutils.get_space:main'
+          ]
+    },
     keywords='C++11, Python bindings',
     long_description="""pybind11""")
-

@@ -204,3 +204,11 @@ try to repartition with dask_process.py
 try again with dask_reprocess.py
 
 <2017-07-03 Mon>
+
+next:
+python -m diskinventory.read_parquet pqfiles/newtera out_newtera
+
+python -m diskinventory.dask_reprocess out_tera tera.parq
+
+python -m diskinventory.dask_reprocess out_tera tera.parq
+
