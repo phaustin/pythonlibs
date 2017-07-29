@@ -31,13 +31,17 @@ if __name__ == "__main__":
     keepit = {}
     keys = ['time', 'name', 'cmdline', 'proc']
     for proc in psutil.process_iter():
+        print(f'interating {proc}')
         try:
             the_dict = dict(zip(keys, (proc.create_time(), proc.exe(),
                                        proc.cmdline(), proc)))
             keepit[proc.pid] = make_tuple(the_dict)
         except (psutil.ZombieProcess, psutil.AccessDenied,
                 psutil.NoSuchProcess):
+            print('hit exception')
             pass
+        except FileNotFoundError:
+            print('file not found')
     print('in killprocs.py, looking for {}'.format(args.snip))
     #
     # don't kill this process or the emacs python parser
@@ -51,6 +55,7 @@ if __name__ == "__main__":
             proclist.append(the_tup)
 
     proconly = [item.proc for item in proclist]
+    print(f'ready to kill {proconly}')
     for item in proconly:
         cmd_string = ' '.join(item.cmdline())
         print('terminating: {}'.format(cmd_string))
