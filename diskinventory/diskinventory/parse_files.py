@@ -17,31 +17,53 @@ example:
 
 parse_files.py du_list.txt ls_list.txt
 
+suppose two files ls_rail.txt and du_rail.txt  with:
+
+head ~/ls_rail.txt
+"/Users/":
+total 0
+drwxr-xr-x+  11       201 _guest   374 2016-04-12 14:00:20.000000000 -0700 "Guest"
+drwxrwxrwt   14 root      wheel    476 2017-06-08 00:00:49.000000000 -0700 "Shared"
+drwxr-xr-x+  14 android   staff    476 2015-10-04 09:24:16.000000000 -0700 "android"
+
+create parquet files for dask dataframe with:
+
+python -m diskinventory.parse_files du_rail.txt ls_rail.txt Users  rail
+
+
 """
 import re, os
 import dateutil.parser as du
 from pytz import timezone
-import datetime as dt
 import pandas as pd
-from pyutils.check_md5 import check_md5
 import logging
-import pyarrow as pa
-import pyarrow.parquet as pq
-
-
-import pandas as pd
+import dask.dataframe
+import numpy as np
 
 def write_all(du_frame,df_list,diskname):
-    table = pa.Table.from_pandas(du_frame)
-    filename=f'df_{diskname}_du.pq'
-    pq.write_table(table, filename,compression='snappy')
+    filename=f'df_{diskname}_du.parq'
+    dask.dataframe.to_parquet(filename,du_frame,compression='SNAPPY',
+                                  write_index=True)
     for counter,item in enumerate(df_list):
         if len(item) > 0:
-            filename=f'df_{diskname}_ls_{counter:03d}.pq'
-            item.reset_index(drop=True,inplace=True)
+            filename=f'df_{diskname}_ls_{counter:03d}.parq'
             print(f'writing file {counter}')
-            table = pa.Table.from_pandas(item)
-            pq.write_table(table, filename,compression='snappy')
+            dask.dataframe.to_parquet(filename,item,compression='SNAPPY',
+                                  write_index=True)
+
+
+def index_frame(collect,start):
+    dataframe=dask.dataframe.from_pandas(pd.DataFrame.from_records(collect))
+    nrecs = len(dataframe)
+    stop = start + nrecs
+    index=np.arange(start,stop)
+    index=dask.dataframe.from_pandas(pd.Series(index),npartitions=1)
+    dataframe.divisions=(start, stop -1)
+    index.divisions=dataframe.divisions
+    dataframe['index']=index
+    dataframe.set_index('index',inplace=True,drop=False)
+    return stop, dataframe
+
 
 def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_interval=1000):
     """
@@ -61,21 +83,24 @@ def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_inter
 
     columnNames = ['permission', 'links', 'owner', 'theGroup', 'size', 'date',
                    'directory', 'name', 'hash']
-    frame_counter = 0
     frame_list = []
     mylog = logging.getLogger('main')
     mylog.propagate = False
     print('here are the handlers', mylog.handlers)
 
     with open(listfile, 'r', encoding='utf-8') as f:
+        start=0
+        stop=0
         errlist = []
         counter = 0
         collect = []
+        frame_list=[]
         for newline in f:
             if (counter > 0) & (counter % blocksize == 0):
-                print("linecount: ", counter)
-                frame_list.append(pd.DataFrame.from_records(collect))
-                frame_counter += 1
+                start=stop
+                print(f"new frame creation: linecount: {counter}")
+                stop,new_frame = index_frame(collect,start)
+                frame_list.append(new_frame)
                 collect = []
             if counter % debug_interval == 0:
                 mylog.info('debug %s %d', 'dump: ', counter)
@@ -153,15 +178,18 @@ def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_inter
                         ## print dt.datetime.fromtimestamp(timestamp)
                         counter += 1
         if len(collect) != 0:
+            start=stop
+            print("linecount: ", counter)
+            stop,new_frame=index_frame(collect,start)
+            frame_list.append(new_frame)
             print('inserting final {} lines'.format(len(collect)))
-            frame_list.append(pd.DataFrame.from_records(collect))
     return counter, frame_list, errlist
 
 
-def read_du(dufile, root_path):
+def read_du(dufile):
     """
        read lines from dufile and transfer to
-       database table the_table
+       a dask dataframe
     """
     columnNames = ['size', 'level', 'directory']
     collect = []
@@ -175,7 +203,8 @@ def read_du(dufile, root_path):
             out = (size, level, direc)
             collect.append(dict(list(zip(columnNames, out))))
     if len(collect) != 0:
-        new_frame = pd.DataFrame.from_records(collect)
+        start=0
+        stop,new_frame=index_frame(collect,start)
     return new_frame
 
 
@@ -185,26 +214,24 @@ def main():
     descrip = textwrap.dedent(globals()['__doc__'])
     parser = argparse.ArgumentParser(formatter_class=linebreaks,
                                      description=descrip)
-    #parser.add_argument('rootdir',  type=str,help='root directory to be stored as prefix')
     parser.add_argument('dulist', type=str, help='filelist generated by du')
     parser.add_argument('listname', type=str, help='filelist generated by ls')
-    parser.add_argument('store_root',
+    parser.add_argument('diskname',
                         type=str,
-                        help='string to appear in h5 files')
+                        help='diskname string to appear in dask files')
     args = parser.parse_args()
 
     dufile = args.dulist
     head, ext = os.path.splitext(dufile)
     print("reading file: ", dufile)
-    h5_root = "du_{}".format(args.store_root)
-    df_du = read_du(dufile, h5_root)
+    df_du = read_du(dufile)
 
     listfile = args.listname
     head, ext = os.path.splitext(listfile)
     print("reading file: ", listfile)
-    h5_root = "ls_{}".format(args.store_root)
-    counter, frame_list, errlist = read_ls(listfile, args.store_root)
-    write_all(df_du,frame_list,args.store_root)
+    output_root = "ls_{}".format(args.diskname)
+    counter, frame_list, errlist = read_ls(listfile, args.diskname)
+    write_all(df_du,frame_list,args.diskname)
     print(f'here is errlist: {errlist}')
     
 if __name__ == "__main__":
