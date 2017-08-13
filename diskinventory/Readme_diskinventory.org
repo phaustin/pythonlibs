@@ -66,8 +66,8 @@ ls -R -l -Q --time-style=full-iso --time=status /newtera/ > /backupspace/stats_n
 du -k /newtera/  > /backupspace/stats_newroc/du_newtera.txt
 ls -R -l -Q --time-style=full-iso --time=status /users/ > /backupspace/stats_newroc/ls_users.txt
 du -k /users/  > /backupspace/stats_newroc/du_users.txt
-
-
+sudo gls -R -l -Q --time-style=full-iso  /Users/ > users_ls.txt
+sudo gdu -k /Users/  > > users_du.txt
 on osx use:  gls and gdu from brew coreutils
 
 
