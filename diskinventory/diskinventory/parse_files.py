@@ -41,9 +41,11 @@ import dask.dataframe
 import numpy as np
 
 def write_all(du_frame,df_list,diskname):
+    chunksize=int(50.e6)
     print(f'received {len(df_list)} ls frames to write')
     filename=f'df_{diskname}_du.parq'
-    dask.dataframe.to_parquet(filename,du_frame,compression='SNAPPY',
+    dask_frame=dask.dataframe.from_pandas(du_frame,chunksize=chunksize)
+    dask.dataframe.to_parquet(filename,dask_frame,compression='SNAPPY',
                                   write_index=True)
     filename=f'df_{diskname}_ls.parq'
     for counter,item in enumerate(df_list):
@@ -69,21 +71,22 @@ def write_all(du_frame,df_list,diskname):
         
 
 def make_index_frame(dataframe,start):
+    chunksize=int(50.e6)
     nrecs = len(dataframe)
     stop = start + nrecs
     print(f'writing index with start:stop {start}:{nrecs}:{stop}')
     index=np.arange(start,stop)
-    index=dask.dataframe.from_pandas(pd.Series(index),npartitions=1)
-    dataframe.divisions=(start, stop -1)
-    index.divisions=dataframe.divisions
+    the_index=pd.Series(index,index=index)
     dataframe['newindex']=index
-    outframe=dataframe.set_index('newindex',inplace=False,drop=True)
-    the_index=outframe.index.values.compute()
+    dataframe.set_index('newindex',drop=True,inplace=True)
+    out_frame=dask.dataframe.from_pandas(dataframe,chunksize=chunksize)
+    out_frame.divisions=(start, stop -1)
+    the_index=out_frame.index.values.compute()
     print(f'inside make_index: here is index start:stop {the_index[0]}:{the_index[-1]}')
     print(f'double check: {start},{nrecs},{stop}')
-    return stop, outframe
+    return stop, out_frame
 
-def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_interval=1000):
+def read_ls(listfile, root_path, blocksize=750000, buffer_length=1.e5,debug_interval=1000):
     """
        read lines from listfile and transfer to
        database dataframe
@@ -118,7 +121,7 @@ def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_inter
                     counter+=1
                     continue
                 print(f"new frame creation: linecount: {counter}")
-                new_frame = dask.dataframe.from_pandas(pd.DataFrame.from_records(collect),chunksize=chunksize)
+                new_frame = pd.DataFrame.from_records(collect)
                 frame_list.append(new_frame)
                 # if len(frame_list) > 2:
                 #     collect=[]
@@ -201,7 +204,7 @@ def read_ls(listfile, root_path, blocksize=50000, buffer_length=1.e5,debug_inter
                         counter += 1
         if len(collect) != 0:
             print("linecount: ", counter)
-            new_frame=dask.dataframe.from_pandas(pd.DataFrame.from_records(collect),chunksize=chunksize)
+            new_frame=pd.DataFrame.from_records(collect)
             frame_list.append(new_frame)
             print('inserting final {} lines'.format(len(collect)))
     return counter, frame_list, errlist
@@ -225,9 +228,7 @@ def read_du(dufile):
             out = (size, level, direc)
             collect.append(dict(list(zip(columnNames, out))))
     if len(collect) != 0:
-        start=0
-        new_frame=dask.dataframe.from_pandas(pd.DataFrame.from_records(collect),
-                                             chunksize=chunksize)
+        new_frame=pd.DataFrame.from_records(collect)
     return new_frame
 
 
