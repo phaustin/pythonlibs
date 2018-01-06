@@ -37,6 +37,33 @@ def normalize_row(row, max_cols):
 
     return r + "\n"
 
+# def make_table(grid):
+#     cell_width = 2 + max(reduce(lambda x,y: x+y, [[max(map(len, str(item).split('\n'))) for item in row] for row in grid], []))
+#     num_cols = len(grid[0])
+#     rst = table_div(num_cols, cell_width, 0)
+#     header_flag = 1
+#     for row in grid:
+#         split_row = [str(cell).split('\n') for cell in row]
+#         lines_remaining = 1
+
+#         while lines_remaining>0:
+#             normalized_cells = []
+#             lines_remaining = 0
+#             for cell in split_row:
+#                 lines_remaining += len(cell)
+
+#                 if len(cell) > 0:
+#                     normalized_cell = normalize_cell(str(cell.pop(0)), cell_width - 1)
+#                 else:
+#                     normalized_cell = normalize_cell('', cell_width - 1)
+
+#                 normalized_cells.append(normalized_cell)
+
+#             rst = rst + '| ' + '| '.join(normalized_cells) + '|\n'
+
+#         rst = rst + table_div(num_cols, cell_width, header_flag)
+#         header_flag = 0
+#     return rst
 
 if __name__ == "__main__":
     print(make_table([['Name', 'Favorite Food', 'Favorite Subject'], [

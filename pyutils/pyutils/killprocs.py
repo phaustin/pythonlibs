@@ -2,10 +2,12 @@
 """
    example:
 
-   python -m pyutils.killprocs mini3
+   killprocs mini3
 
    will kill all process weith mini3 in the name
-   https://pythonhosted.org/psutil/
+
+   requires:
+      https://pythonhosted.org/psutil/
 """
 import psutil
 from pyutils.helper_funs import make_tuple
@@ -18,16 +20,22 @@ def on_terminate(proc):
     print("process {} terminated with exit code {}".format(
                proc, proc.returncode))
 
-
-if __name__ == "__main__":
-
+def make_parser():
     linebreaks = argparse.RawTextHelpFormatter
     descrip = textwrap.dedent(globals()['__doc__'])
     parser = argparse.ArgumentParser(formatter_class=linebreaks,
                                      description=descrip)
     parser.add_argument('snip', type=str, help='string in processname')
-    args = parser.parse_args()
+    return parser
 
+
+def main(args=None):
+    """
+    args: optional -- if missing then args will be taken from command line
+          or pass [h5_file] -- list with name of h5_file to open
+    """
+    parser = make_parser()
+    args = parser.parse_args(args)
     keepit = {}
     keys = ['time', 'name', 'cmdline', 'proc']
     for proc in psutil.process_iter():
@@ -65,4 +73,9 @@ if __name__ == "__main__":
 
     for p in alive:
         p.kill()
-        
+
+
+if __name__ == "__main__":
+
+    main()
+    

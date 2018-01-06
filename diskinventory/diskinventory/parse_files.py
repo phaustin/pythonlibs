@@ -39,34 +39,31 @@ import pandas as pd
 import logging
 import dask.dataframe
 import numpy as np
+from pathlib import Path
 
 def write_all(du_frame,df_list,diskname):
     chunksize=int(50.e6)
     print(f'received {len(df_list)} ls frames to write')
-    filename=f'df_{diskname}_du.parq'
+    filename=str(Path(f'./df_{diskname}_du.parq').resolve())
+    print(f'writing output to {filename}')
     dask_frame=dask.dataframe.from_pandas(du_frame,chunksize=chunksize)
     dask.dataframe.to_parquet(filename,dask_frame,compression='SNAPPY',
                                   write_index=True)
     filename=f'df_{diskname}_ls.parq'
+    start=0
+    dask_append=False
     for counter,item in enumerate(df_list):
         # if counter > 3:
         #     break
         if len(item) > 0:
-            if counter == 0:
-                start=0
-                stop,indexed_frame=make_index_frame(item,start)
-                the_index=indexed_frame.index.values.compute()
-                print(f'here is index start:stop {the_index[0]}:{the_index[-1]}')
-                dask.dataframe.to_parquet(filename,indexed_frame,compression='SNAPPY',
-                                          write_index=True,append=False)
-                start=stop
-            else:
-                stop,indexed_frame=make_index_frame(item,start)
-                the_index=indexed_frame.index.values.compute()
-                print(f'here is index start:stop {the_index[0]}:{the_index[-1]}')
-                dask.dataframe.to_parquet(filename,indexed_frame,compression='SNAPPY',
-                                          write_index=True,append=True)
-                start=stop
+            if counter > 0:
+                dask_append=True
+            stop,indexed_frame=make_index_frame(item,start)
+            the_index=indexed_frame.index.values.compute()
+            print(f'here is index start:stop {the_index[0]}:{the_index[-1]}')
+            dask.dataframe.to_parquet(filename,indexed_frame,compression='SNAPPY',
+                                          write_index=True,append=dask_append)
+            start=stop
             print(f'writing file {counter}')
         
 
@@ -74,7 +71,6 @@ def make_index_frame(dataframe,start):
     chunksize=int(50.e6)
     nrecs = len(dataframe)
     stop = start + nrecs
-    print(f'writing index with start:stop {start}:{nrecs}:{stop}')
     index=np.arange(start,stop)
     the_index=pd.Series(index,index=index)
     dataframe['newindex']=index
@@ -82,8 +78,6 @@ def make_index_frame(dataframe,start):
     out_frame=dask.dataframe.from_pandas(dataframe,chunksize=chunksize)
     out_frame.divisions=(start, stop -1)
     the_index=out_frame.index.values.compute()
-    print(f'inside make_index: here is index start:stop {the_index[0]}:{the_index[-1]}')
-    print(f'double check: {start},{nrecs},{stop}')
     return stop, out_frame
 
 def read_ls(listfile, root_path, blocksize=750000, buffer_length=1.e5,debug_interval=1000):
@@ -115,6 +109,7 @@ def read_ls(listfile, root_path, blocksize=750000, buffer_length=1.e5,debug_inte
         counter = 0
         collect = []
         frame_list=[]
+        debug_counter=0
         for newline in f:
             if (counter > 0) & (counter % blocksize == 0):
                 if len(collect) == 0:
@@ -193,7 +188,13 @@ def read_ls(listfile, root_path, blocksize=750000, buffer_length=1.e5,debug_inte
                         if dirname_capture == root_path:
                             dirname = '.'
                         else:
-                            dirname = dirname_capture[len(root_path):]
+                            #
+                            # add two spaces for slashes:  /Users/
+                            #
+                            dirname = dirname_capture[len(root_path)+2:]
+                            if debug_counter < 10:
+                                print('debug: ',dirname)
+                                debug_counter+=1
                         out = (permission, links, owner, theGroup, size,
                                timestamp, dirname, filename, the_hash)
 

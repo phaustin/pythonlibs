@@ -212,3 +212,18 @@ python -m diskinventory.dask_reprocess out_tera tera.parq
 
 python -m diskinventory.dask_reprocess out_tera tera.parq
 
+python -m diskinventory.parse_files /Users/phil/repos/pythonlibs/diskinventory/datadir/users_du.txt /Users/phil/repos/pythonlibs/diskinventory/datadir/users_ls.txt Users
+
+<2017-08-20 Sun>
+
+* write script to find largest files
+
+[[file:read_files.py][read_files.py]]
+
+data is in
+
+[[file:datadir][file:~/repos/pythonlibs/diskinventory/datadir]]
+
+
+
+

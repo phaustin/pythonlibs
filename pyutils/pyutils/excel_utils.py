@@ -2,6 +2,7 @@ from openpyxl import load_workbook
 import pandas as pd
 from collections import OrderedDict as od
 import numpy as np,pdb
+from pathlib import Path
 
 def cleanit(item):
         cleanitem = item.encode('ascii', 'ignore').decode('ascii')
@@ -9,7 +10,8 @@ def cleanit(item):
     
 
 def make_simple(the_file,numcols=None):
-    wb=load_workbook(the_file,data_only=True)
+    the_file=Path(the_file)    
+    wb=load_workbook(str(the_file),data_only=True)
     combine,=wb.get_sheet_names()
     sheet=wb[combine]
     row_iter=sheet.iter_rows()

@@ -14,7 +14,8 @@ setup(
     ],
     entry_points={
           'console_scripts': [
-              'get_space = pyutils.get_space:main'
+              'get_space = pyutils.get_space:main',
+              'killprocs = pyutils.killprocs:main'
           ]
     },
     keywords='C++11, Python bindings',
