@@ -2,15 +2,16 @@
 """
    example:
 
-   killprocs mini3
+   killprocs python
 
-   will kill all process weith mini3 in the name
+   will kill all processes with python in the name
 
    requires:
-      https://pythonhosted.org/psutil/
+      
+      conda install psutil
 """
 import psutil
-from pyutils.helper_funs import make_tuple
+from .helper_funs import make_tuple
 
 import argparse
 import textwrap
@@ -28,29 +29,26 @@ def make_parser():
     parser.add_argument('snip', type=str, help='string in processname')
     return parser
 
-
 def main(args=None):
     """
     args: optional -- if missing then args will be taken from command line
-          or pass [h5_file] -- list with name of h5_file to open
+          or pass [snippet] -- string to search for in processes
     """
     parser = make_parser()
     args = parser.parse_args(args)
     keepit = {}
     keys = ['time', 'name', 'cmdline', 'proc']
     for proc in psutil.process_iter():
-        print(f'interating {proc}')
         try:
             the_dict = dict(zip(keys, (proc.create_time(), proc.exe(),
                                        proc.cmdline(), proc)))
             keepit[proc.pid] = make_tuple(the_dict)
         except (psutil.ZombieProcess, psutil.AccessDenied,
                 psutil.NoSuchProcess):
-            print('hit exception')
             pass
         except FileNotFoundError:
-            print('file not found')
-    print('in killprocs.py, looking for {}'.format(args.snip))
+            pass
+    print(f'in killprocs, looking for {args.snip}')
     #
     # don't kill this process or the emacs python parser
     #
@@ -63,7 +61,8 @@ def main(args=None):
             proclist.append(the_tup)
 
     proconly = [item.proc for item in proclist]
-    print(f'ready to kill {proconly}')
+    if proconly:
+        print(f'ready to kill {proconly}')
     for item in proconly:
         cmd_string = ' '.join(item.cmdline())
         print('terminating: {}'.format(cmd_string))

@@ -52,4 +52,4 @@ if __name__== "__main__":
     topdir=args.topdir[0]
 
     for fileDict in DirectoryStatWalker(topdir):
-        print fileDict
+        print(fileDict)

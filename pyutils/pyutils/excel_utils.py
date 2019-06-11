@@ -1,4 +1,5 @@
 from openpyxl import load_workbook
+import pdb
 import pandas as pd
 from collections import OrderedDict as od
 import numpy as np,pdb
@@ -23,6 +24,7 @@ def make_simple(the_file,numcols=None):
     clean_head=[cleanit(item) for item in headers[:endcol]]
     lines=[]
     for count,row in enumerate(row_iter):
+        #pdb.set_trace()
         values=[item.value for item in row]
         #print("values: ",values)
         values=values[:endcol]

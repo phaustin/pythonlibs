@@ -9,6 +9,6 @@ for i in [start,stop]:
 elapsed=(stop[0] - start[0]).seconds
 rate=(stop[1] - start[1])/elapsed
 
-print "rate = {} Gybtes/minute".format(rate*60.)
+print("rate = {} Gybtes/minute".format(rate*60.))
     
 

@@ -5,7 +5,7 @@
 
 import os,stat,time,datetime
 
-print "caught walker I"
+print("caught walker I")
 
 class DirectoryStatWalker(object):
     """return {'fullname':fullname, 'fullStats':fullStats,
@@ -50,7 +50,7 @@ if __name__== "__main__":
         keepfiles.append(fileDict)
     for item in keepfiles:
         if item['isDir']:
-            print item['fullname']
+            print(item['fullname'])
     
 
         

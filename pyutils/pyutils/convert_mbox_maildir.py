@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # http://www.hackvalue.nl/en/article/109/migrating%20from%20mbox%20to%20maildir
 
@@ -25,9 +25,9 @@ mbox = mailbox.UnixMailbox(fp, msgfactory)
 
 
 try:
-        storedir = os.mkdir(dirname, 0750)
-        os.mkdir(dirname + "/new", 0750)
-        os.mkdir(dirname + "/cur", 0750)
+        storedir = os.mkdir(dirname, 0o750)
+        os.mkdir(dirname + "/new", 0o750)
+        os.mkdir(dirname + "/cur", 0o750)
 except:
         pass
 
@@ -42,4 +42,5 @@ for mail in mbox:
         mail_file.write(mail.as_string())
 
 
-print "Processed {0} mails".format(count)
+print("Processed {0} mails".format(count))
+

@@ -15,10 +15,11 @@ thefile=StringIO(text)
 theDict=csv.DictReader(thefile)
 import textwrap
 for count,item in enumerate(theDict):
-    print 60*'+'
+    print(60*'+')
     oldtext=item['Pre-class prep question -- SHORT ANSWER (Short Answer)']
     name="%s %s: " % (item['First name'],item['Last name'])
     newtext=unescape(oldtext)
-    print name,textwrap.fill(newtext,width=90)
-    print 60*'+'
+    print(name,textwrap.fill(newtext,width=90))
+    print(60*'+')
+    
     
