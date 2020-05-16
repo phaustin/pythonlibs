@@ -5,7 +5,6 @@
 from setuptools import setup
 
 
-
 setup(
     name='pythonlib',
     packages=['pyutils'],
@@ -19,5 +18,6 @@ setup(
               'run_shrink = pyutils.run_shrink:main'
           ]
     },
+    install_requires=['psutil'],
     keywords='C++11, Python bindings',
     long_description="""pybind11""")
