@@ -18,6 +18,6 @@ setup(
               'run_shrink = pyutils.run_shrink:main'
           ]
     },
-    install_requires=['psutil'],
+    install_requires=['psutil','numpy'],
     keywords='C++11, Python bindings',
     long_description="""pybind11""")
