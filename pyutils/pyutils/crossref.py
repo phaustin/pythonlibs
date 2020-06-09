@@ -44,8 +44,9 @@ related = {http://bit.ly/1DKZ6ra},
 from textwrap import dedent
 import argparse
 from urllib import request
+import click
 
-#from pyutils.bitly_helper import get_connection
+# from pyutils.bitly_helper import get_connection
 
 #
 # assumes utf-8 so ascii characters between 0-127
@@ -53,26 +54,20 @@ from urllib import request
 
 
 def ascii_filt(my_string):
-    return ''.join([i for i in my_string if ord(i) < 128])
+    return "".join([i for i in my_string if ord(i) < 128])
 
 
-if __name__ == "__main__":
 
-    #bitly_conn = get_connection()
+@click.command()
+@click.argument("dois", type=str, nargs=-1)
+def main(dois):
+    # bitly_conn = get_connection()
 
     debug = False
 
-    crossref_api_key = 'paustin@eos.ubc.ca'
+    crossref_api_key = "paustin@eos.ubc.ca"
 
-    linebreaks = argparse.RawTextHelpFormatter
-    descrip = dedent(globals()['__doc__'])
-    parser = argparse.ArgumentParser(
-        formatter_class=linebreaks, description=descrip)
-    parser.add_argument('dois', nargs='+', type=str,
-                        help='one or more document object identifiers')
-    args = parser.parse_args()
-
-    for arg in args.dois:
+    for arg in dois:
         arg = arg.strip()
         arg = arg.strip("doi:")
         arg = arg.strip("http://")
@@ -81,14 +76,20 @@ if __name__ == "__main__":
 
         # doiquote=urllib.parse.quote(doi)
         doiquote = doi
-        wos_url = (r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id'
-                   r'=info:doi/{doi:s}').format(doi=doiquote)
-        citing_url = (r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id='
-                      r'info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&'
-                      r'svc.citing=yes').format(doi=doiquote)
-        related_url = (r'http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&'
-                       r'rft_id=info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&'
-                       r'svc.related=yes').format(doi=doiquote)
+        wos_url = (
+            r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id"
+            r"=info:doi/{doi:s}"
+        ).format(doi=doiquote)
+        citing_url = (
+            r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id="
+            r"info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&"
+            r"svc.citing=yes"
+        ).format(doi=doiquote)
+        related_url = (
+            r"http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&"
+            r"rft_id=info%3Adoi%2F{doi:s}&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Asch_svc&"
+            r"svc.related=yes"
+        ).format(doi=doiquote)
 
         # wos_url = bitly_conn.shorten(wos_url)['url']
         # citing_url = bitly_conn.shorten(citing_url)['url']
@@ -107,8 +108,9 @@ if __name__ == "__main__":
 
         # download the xml
         from xml.dom import minidom
+
         line_dict = dict(doi=doi, crossref_api_key=crossref_api_key)
-        text = 'http://www.crossref.org/openurl/?id=doi:{doi}&noredirect=true&pid={crossref_api_key}&format=unixref'
+        text = "http://www.crossref.org/openurl/?id=doi:{doi}&noredirect=true&pid={crossref_api_key}&format=unixref"
         text = text.format(**line_dict)
         usock = request.urlopen(text)
         xmldoc = minidom.parse(usock)
@@ -138,8 +140,7 @@ if __name__ == "__main__":
         resource = resource.firstChild.data
 
         try:
-            journal_volume = journal_issue.getElementsByTagName("journal_volume")[
-                0]
+            journal_volume = journal_issue.getElementsByTagName("journal_volume")[0]
             volume = journal_issue.getElementsByTagName("volume")[0]
             text_volume = volume.firstChild.data
         except IndexError:
@@ -168,7 +169,7 @@ if __name__ == "__main__":
             authorlist.append(text_surname + ", " + text_given_name)
             # first author?
             sequence = person_name.attributes.getNamedItem("sequence")
-            if sequence.nodeValue == 'first':
+            if sequence.nodeValue == "first":
                 text_first_author_surname = text_surname
 
         try:
@@ -188,8 +189,7 @@ if __name__ == "__main__":
         # physical review
         if pages == None:
             try:
-                pages = journal_article.getElementsByTagName("publisher_item")[
-                    0]
+                pages = journal_article.getElementsByTagName("publisher_item")[0]
             except:
                 pages = None
             try:
@@ -202,11 +202,23 @@ if __name__ == "__main__":
 
         ascii_author = ascii_filt(text_first_author_surname)
         authorlist = " and ".join(authorlist)
-        line_dict = dict(ascii_author=ascii_author, authorlist=authorlist,
-                         text_title=text_title, abbrev_journal_title=abbrev_journal_title,
-                         volume=text_volume, issue=text_issue, year=text_year, year2d=text_year[-2:],
-                         text_first_page=text_first_page, text_last_page=text_last_page, doi=doi, resource=resource,
-                         wos_url=wos_url, citing_url=citing_url, related_url=related_url)
+        line_dict = dict(
+            ascii_author=ascii_author,
+            authorlist=authorlist,
+            text_title=text_title,
+            abbrev_journal_title=abbrev_journal_title,
+            volume=text_volume,
+            issue=text_issue,
+            year=text_year,
+            year2d=text_year[-2:],
+            text_first_page=text_first_page,
+            text_last_page=text_last_page,
+            doi=doi,
+            resource=resource,
+            wos_url=wos_url,
+            citing_url=citing_url,
+            related_url=related_url,
+        )
         text = """
         @ARTICLE{{{ascii_author:}{year2d},
         author = {{{authorlist}}},
@@ -221,10 +233,9 @@ if __name__ == "__main__":
         if not text_issue == "":
             print("issue = {{{issue}}},".format(**line_dict))
         print("year = {{{year}}},".format(**line_dict))
-        if ((text_first_page != "") and (text_last_page != "")):
-            print(
-                "pages = {{{text_first_page}-{text_last_page}}},".format(**line_dict))
-        if ((text_first_page != "") and (text_last_page == "")):
+        if (text_first_page != "") and (text_last_page != ""):
+            print("pages = {{{text_first_page}-{text_last_page}}},".format(**line_dict))
+        if (text_first_page != "") and (text_last_page == ""):
             print("pages = {{{text_first_page}}},".format(**line_dict))
         text = """
         doi = {{{doi}}},
@@ -237,3 +248,7 @@ if __name__ == "__main__":
         text = dedent(text)
         text = text.strip()
         print(text.format(**line_dict))
+
+
+if __name__ == "__main__":
+    main()
