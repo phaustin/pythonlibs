@@ -1,0 +1,46 @@
+{% set version = "0.0.1" %}
+
+package:
+  name: pyutils
+  version: {{ version }}
+
+source:
+  path: ../
+
+build:
+  number: 2
+  
+  entry_points:
+    - get_space = pyutils.get_space:main
+    - killprocs = pyutils.killprocs:main
+    - run_shrink = pyutils.run_shrink:main
+    - crossref = pyutils.crossref:main
+    
+  script: "{{ PYTHON }} -m pip install . --no-deps -vv"
+
+requirements:
+
+  host:
+    - python
+
+  run:
+    - python
+    - psutil
+    - numpy
+
+test:
+  imports:
+    - pyutils
+  commands:
+    - killprocs -h
+    - crossref -h
+
+
+about:
+  home: https://github.com/phaustin/pythonlibs
+  license: LICENSE.txt
+  summary: 'general utilities'
+
+extra:
+  recipe-maintainers:
+    - phaustin
