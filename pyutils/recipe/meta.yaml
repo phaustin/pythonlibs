@@ -20,6 +20,10 @@ build:
 
 requirements:
 
+  build:
+    - python
+    - click
+  
   host:
     - python
 
@@ -27,13 +31,14 @@ requirements:
     - python
     - psutil
     - numpy
+    - click
 
 test:
   imports:
     - pyutils
   commands:
-    - killprocs -h
-    - crossref -h
+    - killprocs --help
+    - crossref --help
 
 
 about:
