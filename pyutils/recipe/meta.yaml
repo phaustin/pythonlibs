@@ -8,7 +8,7 @@ source:
   path: ../
 
 build:
-  number: 2
+  number: 3
   
   entry_points:
     - get_space = pyutils.get_space:main
@@ -23,9 +23,11 @@ requirements:
   build:
     - python
     - click
+    - numpy
   
   host:
     - python
+    - numpy
 
   run:
     - python
@@ -44,6 +46,8 @@ test:
 about:
   home: https://github.com/phaustin/pythonlibs
   license: LICENSE.txt
+  license_family: BSD
+
   summary: 'general utilities'
 
 extra:
