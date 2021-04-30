@@ -1,0 +1,4 @@
+conda-bld
+egg-info
+*egg-info*
+*pycache*

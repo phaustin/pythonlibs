@@ -55,20 +55,23 @@ def main(args=None):
     proclist = []
     for the_tup in keepit.values():
         string_cmd = ' '.join(the_tup.cmdline)
-        if the_tup.name.find(args.snip) > -1 and \
+        if string_cmd.find(args.snip) > -1 and \
            string_cmd.find('killprocs') == -1 and \
            string_cmd.find('elpy') == -1:
             proclist.append(the_tup)
 
     proconly = [item.proc for item in proclist]
-    if proconly:
-        print(f'ready to kill {proconly}')
-    for item in proconly:
-        cmd_string = ' '.join(item.cmdline())
-        print('terminating: {}'.format(cmd_string))
-    [proc.terminate() for proc in proconly]
+    good_procs=[]
+    for the_proc in proconly:
+        try:
+            the_proc.terminate()
+            good_procs.append(the_proc)
+            cmd_string = ' '.join(the_proc.cmdline())
+            print('terminating: {}'.format(cmd_string))
+        except:
+            pass
 
-    gone, alive = psutil.wait_procs(proconly, timeout=3, callback=on_terminate)
+    gone, alive = psutil.wait_procs(good_procs, timeout=3, callback=on_terminate)
 
     for p in alive:
         p.kill()

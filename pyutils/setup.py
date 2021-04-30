@@ -8,6 +8,7 @@ from setuptools import setup
 setup(
     name='pyutils',
     packages=['pyutils'],
+    version=0.1,
     classifiers=[
         'License :: OSI Approved :: BSD License'
     ],
