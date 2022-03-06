@@ -53,21 +53,23 @@ def main(args=None):
     # don't kill this process or the emacs python parser
     #
     proclist = []
+    cmdlist = []
     for the_tup in keepit.values():
         string_cmd = ' '.join(the_tup.cmdline)
         if string_cmd.find(args.snip) > -1 and \
            string_cmd.find('killprocs') == -1 and \
            string_cmd.find('elpy') == -1:
             proclist.append(the_tup)
+            cmdlist.append(string_cmd)
 
     proconly = [item.proc for item in proclist]
     good_procs=[]
-    for the_proc in proconly:
+    for the_proc,the_cmd in zip(proconly,cmdlist):
         try:
             the_proc.terminate()
             good_procs.append(the_proc)
             cmd_string = ' '.join(the_proc.cmdline())
-            print('terminating: {}'.format(cmd_string))
+            print(f'terminating: {the_cmd}')
         except:
             pass
 

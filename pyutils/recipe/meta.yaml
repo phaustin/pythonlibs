@@ -1,4 +1,4 @@
-{% set version = "0.0.1" %}
+{% set version = "0.4" %}
 
 package:
   name: pyutils
@@ -8,7 +8,7 @@ source:
   path: ../
 
 build:
-  number: 3
+  number: 0
   
   entry_points:
     - get_space = pyutils.get_space:main
@@ -21,18 +21,18 @@ build:
 requirements:
 
   build:
-    - python
+    - python >=3.9
     - click
-    - numpy
+    - numpy >1.20
   
   host:
-    - python
+    - python >=3.9
     - numpy
 
   run:
-    - python
+    - python >=3.9
     - psutil
-    - numpy
+    - numpy >1.20
     - click
 
 test:
